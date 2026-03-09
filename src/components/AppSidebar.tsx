@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard,
   ArrowLeftRight,
@@ -38,6 +39,8 @@ const settingsNav = [
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
 
   return (
     <aside
@@ -112,9 +115,9 @@ export function AppSidebar() {
         </ul>
       </nav>
 
-      {/* Footer */}
       <div className="border-t border-sidebar-border p-3">
         <button
+          onClick={async () => { await signOut(); navigate("/login"); }}
           className={cn(
             "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-colors",
             collapsed && "justify-center px-0"
