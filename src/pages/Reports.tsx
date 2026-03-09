@@ -1,9 +1,8 @@
 import { motion } from "framer-motion";
-import { monthlyData } from "@/data/mockData";
+import { useTransactions, useCategories } from "@/hooks/useSupabaseData";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell,
 } from "recharts";
-import { mockTransactions, mockCategories } from "@/data/mockData";
 
 function formatCurrency(value: number) {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -12,10 +11,29 @@ function formatCurrency(value: number) {
 const COLORS = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#06b6d4", "#14b8a6"];
 
 const Reports = () => {
-  const expenseByCategory = mockCategories
+  const { data: transactions = [] } = useTransactions();
+  const { data: categories = [] } = useCategories();
+
+  const now = new Date();
+  const monthlyData = Array.from({ length: 6 }, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - 5 + i, 1);
+    const m = d.getMonth();
+    const y = d.getFullYear();
+    const monthTx = transactions.filter((t) => {
+      const td = new Date(t.due_date);
+      return td.getMonth() === m && td.getFullYear() === y;
+    });
+    return {
+      month: d.toLocaleString("pt-BR", { month: "short" }),
+      receitas: monthTx.filter((t) => t.type === "receita" && t.status === "recebido").reduce((s, t) => s + Number(t.amount), 0),
+      despesas: monthTx.filter((t) => t.type === "despesa" && t.status === "pago").reduce((s, t) => s + Number(t.amount), 0),
+    };
+  });
+
+  const expenseByCategory = categories
     .filter(c => c.type === "despesa")
     .map(cat => {
-      const total = mockTransactions.filter(t => t.category === cat.name && t.status === "pago").reduce((s, t) => s + t.amount, 0);
+      const total = transactions.filter(t => t.category_id === cat.id && t.status === "pago").reduce((s, t) => s + Number(t.amount), 0);
       return { name: cat.name, value: total, icon: cat.icon };
     })
     .filter(c => c.value > 0);
@@ -44,24 +62,28 @@ const Reports = () => {
 
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card rounded-xl p-5">
           <h3 className="text-sm font-semibold text-foreground mb-4">Despesas por Categoria</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie data={expenseByCategory} cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={3} dataKey="value">
-                {expenseByCategory.map((_, i) => (
-                  <Cell key={i} fill={COLORS[i % COLORS.length]} />
+          {expenseByCategory.length === 0 ? (
+            <div className="flex items-center justify-center h-[300px] text-muted-foreground text-sm">Sem dados de despesas.</div>
+          ) : (
+            <>
+              <ResponsiveContainer width="100%" height={260}>
+                <PieChart>
+                  <Pie data={expenseByCategory} cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={3} dataKey="value">
+                    {expenseByCategory.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                  </Pie>
+                  <Tooltip contentStyle={{ backgroundColor: "hsl(220 22% 10%)", border: "1px solid hsl(220 20% 15%)", borderRadius: "8px", color: "hsl(220 10% 90%)" }} formatter={(value: number) => formatCurrency(value)} />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="flex flex-wrap gap-3 mt-2 justify-center">
+                {expenseByCategory.map((cat, i) => (
+                  <div key={cat.name} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                    {cat.icon} {cat.name}
+                  </div>
                 ))}
-              </Pie>
-              <Tooltip contentStyle={{ backgroundColor: "hsl(220 22% 10%)", border: "1px solid hsl(220 20% 15%)", borderRadius: "8px", color: "hsl(220 10% 90%)" }} formatter={(value: number) => formatCurrency(value)} />
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="flex flex-wrap gap-3 mt-2 justify-center">
-            {expenseByCategory.map((cat, i) => (
-              <div key={cat.name} className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
-                {cat.icon} {cat.name}
               </div>
-            ))}
-          </div>
+            </>
+          )}
         </motion.div>
       </div>
     </div>
