@@ -1,13 +1,13 @@
 import { useCategories, useDeleteCategory } from "@/hooks/useSupabaseData";
 import { motion } from "framer-motion";
-import { Plus, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CreateCategoryDialog } from "@/components/dialogs/CreateCategoryDialog";
 import { toast } from "sonner";
 
 const Categories = () => {
   const { data: categories = [], isLoading } = useCategories();
   const deleteCategory = useDeleteCategory();
-
   const receitas = categories.filter(c => c.type === "receita");
   const despesas = categories.filter(c => c.type === "despesa");
 
@@ -18,9 +18,8 @@ const Categories = () => {
           <h1 className="text-2xl font-bold tracking-tight text-foreground">Categorias</h1>
           <p className="text-sm text-muted-foreground">Organize suas transações por categoria</p>
         </div>
-        <Button className="gap-2"><Plus className="h-4 w-4" /> Nova Categoria</Button>
+        <CreateCategoryDialog />
       </div>
-
       {isLoading ? (
         <p className="text-muted-foreground">Carregando...</p>
       ) : categories.length === 0 ? (

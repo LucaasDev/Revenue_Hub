@@ -1,7 +1,8 @@
 import { useGoals, useDeleteGoal } from "@/hooks/useSupabaseData";
 import { motion } from "framer-motion";
-import { Plus, Target, Trash2 } from "lucide-react";
+import { Target, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CreateGoalDialog } from "@/components/dialogs/CreateGoalDialog";
 import { toast } from "sonner";
 
 function formatCurrency(value: number) {
@@ -19,9 +20,8 @@ const Goals = () => {
           <h1 className="text-2xl font-bold tracking-tight text-foreground">Metas</h1>
           <p className="text-sm text-muted-foreground">Acompanhe seus objetivos financeiros</p>
         </div>
-        <Button className="gap-2"><Plus className="h-4 w-4" /> Nova Meta</Button>
+        <CreateGoalDialog />
       </div>
-
       {isLoading ? (
         <p className="text-muted-foreground">Carregando...</p>
       ) : goals.length === 0 ? (
