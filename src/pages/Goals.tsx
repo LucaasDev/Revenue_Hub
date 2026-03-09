@@ -1,9 +1,10 @@
-import { useGoals, useDeleteGoal } from "@/hooks/useSupabaseData";
+import { useState } from "react";
+import { useGoals } from "@/hooks/useSupabaseData";
 import { motion } from "framer-motion";
-import { Target, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Target } from "lucide-react";
 import { CreateGoalDialog } from "@/components/dialogs/CreateGoalDialog";
-import { toast } from "sonner";
+import { EditGoalDialog } from "@/components/dialogs/EditGoalDialog";
+import type { Tables } from "@/integrations/supabase/types";
 
 function formatCurrency(value: number) {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -11,7 +12,7 @@ function formatCurrency(value: number) {
 
 const Goals = () => {
   const { data: goals = [], isLoading } = useGoals();
-  const deleteGoal = useDeleteGoal();
+  const [editing, setEditing] = useState<Tables<"goals"> | null>(null);
 
   return (
     <div className="space-y-6">
@@ -33,11 +34,8 @@ const Goals = () => {
             const remaining = Number(goal.target_amount) - Number(goal.current_amount);
             return (
               <motion.div key={goal.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
-                className="glass-card rounded-xl p-5 hover:border-primary/30 transition-colors group relative">
-                <Button variant="ghost" size="icon" className="absolute top-3 right-3 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
-                  onClick={() => deleteGoal.mutate(goal.id, { onSuccess: () => toast.success("Meta excluída") })}>
-                  <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                </Button>
+                className="glass-card rounded-xl p-5 hover:border-primary/30 transition-colors cursor-pointer"
+                onClick={() => setEditing(goal)}>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg gradient-primary">
                     <Target className="h-5 w-5 text-primary-foreground" />
@@ -66,6 +64,7 @@ const Goals = () => {
           })}
         </div>
       )}
+      <EditGoalDialog goal={editing} open={!!editing} onOpenChange={(o) => !o && setEditing(null)} />
     </div>
   );
 };
