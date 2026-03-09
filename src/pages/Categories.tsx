@@ -1,13 +1,13 @@
-import { useCategories, useDeleteCategory } from "@/hooks/useSupabaseData";
+import { useState } from "react";
+import { useCategories } from "@/hooks/useSupabaseData";
 import { motion } from "framer-motion";
-import { Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { CreateCategoryDialog } from "@/components/dialogs/CreateCategoryDialog";
-import { toast } from "sonner";
+import { EditCategoryDialog } from "@/components/dialogs/EditCategoryDialog";
+import type { Tables } from "@/integrations/supabase/types";
 
 const Categories = () => {
   const { data: categories = [], isLoading } = useCategories();
-  const deleteCategory = useDeleteCategory();
+  const [editing, setEditing] = useState<Tables<"categories"> | null>(null);
   const receitas = categories.filter(c => c.type === "receita");
   const despesas = categories.filter(c => c.type === "despesa");
 
@@ -34,18 +34,13 @@ const Categories = () => {
               ) : (
                 <div className="space-y-2">
                   {group.items.map((cat) => (
-                    <div key={cat.id} className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-muted/30 transition-colors group">
+                    <div key={cat.id} className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-muted/30 transition-colors cursor-pointer"
+                      onClick={() => setEditing(cat)}>
                       <div className="flex items-center gap-3">
                         <span className="text-lg">{cat.icon}</span>
                         <span className="text-sm font-medium text-foreground">{cat.name}</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <div className="h-3 w-3 rounded-full" style={{ backgroundColor: cat.color }} />
-                        <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() => deleteCategory.mutate(cat.id, { onSuccess: () => toast.success("Categoria excluída") })}>
-                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                        </Button>
-                      </div>
+                      <div className="h-3 w-3 rounded-full" style={{ backgroundColor: cat.color }} />
                     </div>
                   ))}
                 </div>
@@ -54,6 +49,7 @@ const Categories = () => {
           ))}
         </div>
       )}
+      <EditCategoryDialog category={editing} open={!!editing} onOpenChange={(o) => !o && setEditing(null)} />
     </div>
   );
 };

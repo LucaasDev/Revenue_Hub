@@ -77,7 +77,7 @@ export function AppTopNav() {
           <DropdownMenu>
             <DropdownMenuTrigger className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
               <User className="h-4 w-4" />
-              <span className="hidden lg:block max-w-[150px] truncate">{user?.email}</span>
+              <span className="hidden lg:block max-w-[150px] truncate">{user?.user_metadata?.display_name || user?.email}</span>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuItem onClick={() => navigate("/profile")}>

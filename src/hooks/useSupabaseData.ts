@@ -79,7 +79,27 @@ export function useCreateCategory() {
   });
 }
 
+export function useUpdateCategory() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...updates }: TablesUpdate<"categories"> & { id: string }) => {
+      const { error } = await supabase.from("categories").update(updates).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["categories"] }),
+  });
+}
+
 export function useDeleteCategory() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("categories").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["categories"] }),
+  });
+}
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {

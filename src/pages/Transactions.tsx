@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { useTransactions, useDeleteTransaction, useUpdateTransaction } from "@/hooks/useSupabaseData";
+import { useTransactions, useUpdateTransaction } from "@/hooks/useSupabaseData";
 import { motion } from "framer-motion";
-import { Search, Trash2, CheckCircle } from "lucide-react";
+import { Search, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CreateTransactionDialog } from "@/components/dialogs/CreateTransactionDialog";
+import { EditTransactionDialog } from "@/components/dialogs/EditTransactionDialog";
 import { toast } from "sonner";
 
 function formatCurrency(value: number) {
@@ -16,8 +17,8 @@ const Transactions = () => {
   const [filterType, setFilterType] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
   const [search, setSearch] = useState("");
+  const [editing, setEditing] = useState<any>(null);
   const { data: transactions = [], isLoading } = useTransactions();
-  const deleteTx = useDeleteTransaction();
   const updateTx = useUpdateTransaction();
 
   const filtered = transactions.filter((t) => {
@@ -82,7 +83,8 @@ const Transactions = () => {
               </thead>
               <tbody>
                 {filtered.map((t) => (
-                  <tr key={t.id} className="border-b border-border/30 hover:bg-muted/30 transition-colors">
+                  <tr key={t.id} className="border-b border-border/30 hover:bg-muted/30 transition-colors cursor-pointer"
+                    onClick={() => setEditing(t)}>
                     <td className="px-5 py-3">
                       <span className={`inline-block rounded-full px-2.5 py-1 text-[11px] font-medium ${
                         t.status === "pago" || t.status === "recebido" ? "bg-success/10 text-success" : "bg-warning/10 text-warning"
@@ -95,20 +97,15 @@ const Transactions = () => {
                     <td className={`px-5 py-3 text-sm font-semibold text-right ${t.type === "receita" ? "text-success" : "text-destructive"}`}>
                       {t.type === "receita" ? "+" : "-"} {formatCurrency(Number(t.amount))}
                     </td>
-                    <td className="px-5 py-3 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        {t.status === "pendente" && (
-                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => {
-                            const newStatus = t.type === "receita" ? "recebido" : "pago";
-                            updateTx.mutate({ id: t.id, status: newStatus as any }, { onSuccess: () => toast.success("Status atualizado") });
-                          }}>
-                            <CheckCircle className="h-3.5 w-3.5 text-success" />
-                          </Button>
-                        )}
-                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => deleteTx.mutate(t.id, { onSuccess: () => toast.success("Transação excluída") })}>
-                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                    <td className="px-5 py-3 text-right" onClick={(e) => e.stopPropagation()}>
+                      {t.status === "pendente" && (
+                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => {
+                          const newStatus = t.type === "receita" ? "recebido" : "pago";
+                          updateTx.mutate({ id: t.id, status: newStatus as any }, { onSuccess: () => toast.success("Status atualizado") });
+                        }}>
+                          <CheckCircle className="h-3.5 w-3.5 text-success" />
                         </Button>
-                      </div>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -117,6 +114,7 @@ const Transactions = () => {
           </div>
         )}
       </motion.div>
+      <EditTransactionDialog transaction={editing} open={!!editing} onOpenChange={(o) => !o && setEditing(null)} />
     </div>
   );
 };
