@@ -45,7 +45,7 @@ export function AppTopNav() {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg gradient-primary">
             <Wallet className="h-4 w-4 text-primary-foreground" />
           </div>
-          <span className="text-sm font-bold text-foreground tracking-tight hidden sm:block">
+          <span className="text-lg font-bold text-foreground tracking-tight hidden sm:block">
             Avenue
           </span>
         </NavLink>
