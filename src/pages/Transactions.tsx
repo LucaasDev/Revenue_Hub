@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useTransactions, useDeleteTransaction, useUpdateTransaction } from "@/hooks/useSupabaseData";
 import { motion } from "framer-motion";
-import { Plus, Search, Trash2, CheckCircle } from "lucide-react";
+import { Search, Trash2, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CreateTransactionDialog } from "@/components/dialogs/CreateTransactionDialog";
 import { toast } from "sonner";
 
 function formatCurrency(value: number) {
@@ -26,15 +27,6 @@ const Transactions = () => {
     return true;
   });
 
-  const handleDelete = (id: string) => {
-    deleteTx.mutate(id, { onSuccess: () => toast.success("Transação excluída") });
-  };
-
-  const handleMarkPaid = (id: string, type: string) => {
-    const newStatus = type === "receita" ? "recebido" : "pago";
-    updateTx.mutate({ id, status: newStatus as any }, { onSuccess: () => toast.success("Status atualizado") });
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -42,7 +34,7 @@ const Transactions = () => {
           <h1 className="text-2xl font-bold tracking-tight text-foreground">Fluxo de Caixa</h1>
           <p className="text-sm text-muted-foreground">{filtered.length} transações</p>
         </div>
-        <Button className="gap-2"><Plus className="h-4 w-4" /> Nova Transação</Button>
+        <CreateTransactionDialog />
       </div>
 
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="glass-card rounded-xl p-4 flex flex-wrap gap-3 items-center">
@@ -106,11 +98,14 @@ const Transactions = () => {
                     <td className="px-5 py-3 text-right">
                       <div className="flex items-center justify-end gap-1">
                         {t.status === "pendente" && (
-                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleMarkPaid(t.id, t.type)}>
+                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => {
+                            const newStatus = t.type === "receita" ? "recebido" : "pago";
+                            updateTx.mutate({ id: t.id, status: newStatus as any }, { onSuccess: () => toast.success("Status atualizado") });
+                          }}>
                             <CheckCircle className="h-3.5 w-3.5 text-success" />
                           </Button>
                         )}
-                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleDelete(t.id)}>
+                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => deleteTx.mutate(t.id, { onSuccess: () => toast.success("Transação excluída") })}>
                           <Trash2 className="h-3.5 w-3.5 text-destructive" />
                         </Button>
                       </div>

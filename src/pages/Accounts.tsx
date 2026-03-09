@@ -1,19 +1,19 @@
 import { useAccounts, useDeleteAccount } from "@/hooks/useSupabaseData";
 import { motion } from "framer-motion";
-import { Plus, Landmark, Wallet, TrendingUp, Trash2 } from "lucide-react";
+import { Landmark, Wallet, TrendingUp, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CreateAccountDialog } from "@/components/dialogs/CreateAccountDialog";
 import { toast } from "sonner";
 
 function formatCurrency(value: number) {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
-const iconMap = { corrente: Landmark, carteira: Wallet, investimento: TrendingUp };
+const iconMap: Record<string, any> = { corrente: Landmark, carteira: Wallet, investimento: TrendingUp };
 
 const Accounts = () => {
   const { data: accounts = [], isLoading } = useAccounts();
   const deleteAccount = useDeleteAccount();
-
   const totalBalance = accounts.reduce((sum, a) => sum + Number(a.balance), 0);
 
   return (
@@ -23,9 +23,8 @@ const Accounts = () => {
           <h1 className="text-2xl font-bold tracking-tight text-foreground">Contas</h1>
           <p className="text-sm text-muted-foreground">Saldo total: {formatCurrency(totalBalance)}</p>
         </div>
-        <Button className="gap-2"><Plus className="h-4 w-4" /> Nova Conta</Button>
+        <CreateAccountDialog />
       </div>
-
       {isLoading ? (
         <p className="text-muted-foreground">Carregando...</p>
       ) : accounts.length === 0 ? (

@@ -1,12 +1,12 @@
 import { Outlet } from "react-router-dom";
-import { AppSidebar } from "./AppSidebar";
+import { AppTopNav } from "./AppTopNav";
 
 export function AppLayout() {
   return (
     <div className="min-h-screen bg-background dark">
-      <AppSidebar />
-      <main className="ml-[260px] min-h-screen transition-all duration-300">
-        <div className="p-6 lg:p-8">
+      <AppTopNav />
+      <main className="min-h-[calc(100vh-64px)] pt-16">
+        <div className="max-w-7xl mx-auto p-6 lg:p-8">
           <Outlet />
         </div>
       </main>
