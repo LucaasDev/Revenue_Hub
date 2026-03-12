@@ -22,6 +22,7 @@ export function EditTransactionDialog({ transaction, open, onOpenChange }: Props
   const [accountId, setAccountId] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [status, setStatus] = useState<"pendente" | "pago" | "recebido">("pendente");
+  const [classification, setClassification] = useState<"receita" | "fixa" | "variavel">("variavel");
   const updateTx = useUpdateTransaction();
   const deleteTx = useDeleteTransaction();
   const { data: accounts = [] } = useAccounts();
@@ -36,16 +37,31 @@ export function EditTransactionDialog({ transaction, open, onOpenChange }: Props
       setAccountId(transaction.account_id);
       setCategoryId(transaction.category_id || "");
       setStatus(transaction.status);
+      if (transaction.type === "receita") {
+        setClassification("receita");
+      } else if (transaction.is_recurring) {
+        setClassification("fixa");
+      } else {
+        setClassification("variavel");
+      }
     }
   }, [transaction]);
 
   const filteredCategories = categories.filter((c) => c.type === type);
 
+  const handleClassificationChange = (val: string) => {
+    setClassification(val as any);
+    if (val === "receita") { setType("receita"); } else { setType("despesa"); }
+    setCategoryId("");
+  };
+
+  const isRecurring = classification === "fixa";
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!transaction) return;
     updateTx.mutate(
-      { id: transaction.id, name: name.trim(), type, amount: parseFloat(amount), due_date: dueDate, account_id: accountId, category_id: categoryId || null, status },
+      { id: transaction.id, name: name.trim(), type, amount: parseFloat(amount), due_date: dueDate, account_id: accountId, category_id: categoryId || null, status, is_recurring: isRecurring },
       { onSuccess: () => { toast.success("Transação atualizada!"); onOpenChange(false); }, onError: () => toast.error("Erro ao atualizar") }
     );
   };
@@ -61,12 +77,13 @@ export function EditTransactionDialog({ transaction, open, onOpenChange }: Props
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Tipo</Label>
-              <Select value={type} onValueChange={(v: any) => { setType(v); setCategoryId(""); }}>
+              <Label>Classificação</Label>
+              <Select value={classification} onValueChange={handleClassificationChange}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="receita">Receita</SelectItem>
-                  <SelectItem value="despesa">Despesa</SelectItem>
+                  <SelectItem value="receita">💰 Receita</SelectItem>
+                  <SelectItem value="fixa">📌 Despesa Fixa</SelectItem>
+                  <SelectItem value="variavel">🔀 Despesa Variável</SelectItem>
                 </SelectContent>
               </Select>
             </div>
