@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { useTransactions, useUpdateTransaction } from "@/hooks/useSupabaseData";
 import { motion } from "framer-motion";
-import { Search, CheckCircle, TrendingUp, TrendingDown, Pin, Shuffle } from "lucide-react";
+import { Search, CheckCircle, TrendingUp, Pin, Shuffle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CreateTransactionDialog } from "@/components/dialogs/CreateTransactionDialog";
 import { EditTransactionDialog } from "@/components/dialogs/EditTransactionDialog";
 import { toast } from "sonner";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 function formatCurrency(value: number) {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -16,7 +15,7 @@ function formatCurrency(value: number) {
 
 function TransactionTable({ transactions, onEdit, updateTx }: { transactions: any[]; onEdit: (t: any) => void; updateTx: any }) {
   if (transactions.length === 0) {
-    return <div className="p-8 text-center text-muted-foreground">Nenhuma transação encontrada.</div>;
+    return <div className="p-6 text-center text-muted-foreground text-sm">Nenhuma transação encontrada.</div>;
   }
   return (
     <div className="overflow-x-auto">
@@ -34,8 +33,7 @@ function TransactionTable({ transactions, onEdit, updateTx }: { transactions: an
         </thead>
         <tbody>
           {transactions.map((t) => (
-            <tr key={t.id} className="border-b border-border/30 hover:bg-muted/30 transition-colors cursor-pointer"
-              onClick={() => onEdit(t)}>
+            <tr key={t.id} className="border-b border-border/30 hover:bg-muted/30 transition-colors cursor-pointer" onClick={() => onEdit(t)}>
               <td className="px-5 py-3">
                 <span className={`inline-block rounded-full px-2.5 py-1 text-[11px] font-medium ${
                   t.status === "pago" || t.status === "recebido" ? "bg-success/10 text-success" : "bg-warning/10 text-warning"
@@ -62,6 +60,20 @@ function TransactionTable({ transactions, onEdit, updateTx }: { transactions: an
           ))}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+function SectionHeader({ icon: Icon, title, total, variant }: { icon: any; title: string; total: number; variant: "income" | "expense" }) {
+  return (
+    <div className="flex items-center justify-between px-5 py-3 border-b border-border/50">
+      <div className="flex items-center gap-2">
+        <Icon className={`h-4 w-4 ${variant === "income" ? "text-success" : "text-destructive"}`} />
+        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+      </div>
+      <span className={`text-sm font-semibold ${variant === "income" ? "text-success" : "text-destructive"}`}>
+        {formatCurrency(total)}
+      </span>
     </div>
   );
 }
@@ -117,40 +129,22 @@ const Transactions = () => {
       {isLoading ? (
         <div className="p-8 text-center text-muted-foreground">Carregando...</div>
       ) : (
-        <Tabs defaultValue="receitas" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="receitas" className="gap-2">
-              <TrendingUp className="h-4 w-4" /> Receitas
-              <span className="ml-1 text-xs text-muted-foreground">({formatCurrency(totalReceitas)})</span>
-            </TabsTrigger>
-            <TabsTrigger value="fixas" className="gap-2">
-              <Pin className="h-4 w-4" /> Desp. Fixas
-              <span className="ml-1 text-xs text-muted-foreground">({formatCurrency(totalFixas)})</span>
-            </TabsTrigger>
-            <TabsTrigger value="variaveis" className="gap-2">
-              <Shuffle className="h-4 w-4" /> Desp. Variáveis
-              <span className="ml-1 text-xs text-muted-foreground">({formatCurrency(totalVariaveis)})</span>
-            </TabsTrigger>
-          </TabsList>
+        <div className="space-y-6">
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card rounded-xl overflow-hidden">
+            <SectionHeader icon={TrendingUp} title="Receitas" total={totalReceitas} variant="income" />
+            <TransactionTable transactions={receitas} onEdit={setEditing} updateTx={updateTx} />
+          </motion.div>
 
-          <TabsContent value="receitas">
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="glass-card rounded-xl overflow-hidden">
-              <TransactionTable transactions={receitas} onEdit={setEditing} updateTx={updateTx} />
-            </motion.div>
-          </TabsContent>
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card rounded-xl overflow-hidden">
+            <SectionHeader icon={Pin} title="Despesas Fixas" total={totalFixas} variant="expense" />
+            <TransactionTable transactions={despesasFixas} onEdit={setEditing} updateTx={updateTx} />
+          </motion.div>
 
-          <TabsContent value="fixas">
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="glass-card rounded-xl overflow-hidden">
-              <TransactionTable transactions={despesasFixas} onEdit={setEditing} updateTx={updateTx} />
-            </motion.div>
-          </TabsContent>
-
-          <TabsContent value="variaveis">
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="glass-card rounded-xl overflow-hidden">
-              <TransactionTable transactions={despesasVariaveis} onEdit={setEditing} updateTx={updateTx} />
-            </motion.div>
-          </TabsContent>
-        </Tabs>
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="glass-card rounded-xl overflow-hidden">
+            <SectionHeader icon={Shuffle} title="Despesas Variáveis" total={totalVariaveis} variant="expense" />
+            <TransactionTable transactions={despesasVariaveis} onEdit={setEditing} updateTx={updateTx} />
+          </motion.div>
+        </div>
       )}
 
       <EditTransactionDialog transaction={editing} open={!!editing} onOpenChange={(o) => !o && setEditing(null)} />
