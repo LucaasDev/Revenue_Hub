@@ -49,12 +49,21 @@ export function EditTransactionDialog({ transaction, open, onOpenChange }: Props
 
   const filteredCategories = categories.filter((c) => c.type === type);
 
+  const handleClassificationChange = (val: string) => {
+    setClassification(val as any);
+    if (val === "receita") { setType("receita"); } else { setType("despesa"); }
+    setCategoryId("");
+  };
+
+  const isRecurring = classification === "fixa";
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!transaction) return;
     updateTx.mutate(
-      { id: transaction.id, name: name.trim(), type, amount: parseFloat(amount), due_date: dueDate, account_id: accountId, category_id: categoryId || null, status },
+      { id: transaction.id, name: name.trim(), type, amount: parseFloat(amount), due_date: dueDate, account_id: accountId, category_id: categoryId || null, status, is_recurring: isRecurring },
       { onSuccess: () => { toast.success("Transação atualizada!"); onOpenChange(false); }, onError: () => toast.error("Erro ao atualizar") }
+    );
     );
   };
 
