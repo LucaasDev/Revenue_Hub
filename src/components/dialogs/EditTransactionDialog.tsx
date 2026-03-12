@@ -37,6 +37,13 @@ export function EditTransactionDialog({ transaction, open, onOpenChange }: Props
       setAccountId(transaction.account_id);
       setCategoryId(transaction.category_id || "");
       setStatus(transaction.status);
+      if (transaction.type === "receita") {
+        setClassification("receita");
+      } else if (transaction.is_recurring) {
+        setClassification("fixa");
+      } else {
+        setClassification("variavel");
+      }
     }
   }, [transaction]);
 
