@@ -77,12 +77,13 @@ export function EditTransactionDialog({ transaction, open, onOpenChange }: Props
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Tipo</Label>
-              <Select value={type} onValueChange={(v: any) => { setType(v); setCategoryId(""); }}>
+              <Label>Classificação</Label>
+              <Select value={classification} onValueChange={handleClassificationChange}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="receita">Receita</SelectItem>
-                  <SelectItem value="despesa">Despesa</SelectItem>
+                  <SelectItem value="receita">💰 Receita</SelectItem>
+                  <SelectItem value="fixa">📌 Despesa Fixa</SelectItem>
+                  <SelectItem value="variavel">🔀 Despesa Variável</SelectItem>
                 </SelectContent>
               </Select>
             </div>
