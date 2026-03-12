@@ -22,6 +22,7 @@ export function EditTransactionDialog({ transaction, open, onOpenChange }: Props
   const [accountId, setAccountId] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [status, setStatus] = useState<"pendente" | "pago" | "recebido">("pendente");
+  const [classification, setClassification] = useState<"receita" | "fixa" | "variavel">("variavel");
   const updateTx = useUpdateTransaction();
   const deleteTx = useDeleteTransaction();
   const { data: accounts = [] } = useAccounts();
