@@ -64,7 +64,6 @@ export function EditTransactionDialog({ transaction, open, onOpenChange }: Props
       { id: transaction.id, name: name.trim(), type, amount: parseFloat(amount), due_date: dueDate, account_id: accountId, category_id: categoryId || null, status, is_recurring: isRecurring },
       { onSuccess: () => { toast.success("Transação atualizada!"); onOpenChange(false); }, onError: () => toast.error("Erro ao atualizar") }
     );
-    );
   };
 
   return (
