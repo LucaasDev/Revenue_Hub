@@ -41,6 +41,7 @@ function AppRoutes() {
         <Route path="/categories" element={<Categories />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/settings/accounts" element={<SettingsAccounts />} />
+        <Route path="/family" element={<FamilyMembers />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>

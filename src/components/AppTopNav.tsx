@@ -8,6 +8,7 @@ import {
   BarChart3,
   Tags,
   User,
+  Users,
   LogOut,
   Wallet,
   Menu,
