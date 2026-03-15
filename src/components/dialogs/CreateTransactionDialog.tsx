@@ -125,6 +125,22 @@ export function CreateTransactionDialog() {
               </SelectContent>
             </Select>
           </div>
+          {type === "despesa" && (
+            <div className="space-y-3 rounded-lg border border-border p-3">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="goal-reservation" className="text-sm">🎯 Reservar para meta</Label>
+                <Switch id="goal-reservation" checked={isGoalReservation} onCheckedChange={(v) => { setIsGoalReservation(v); if (!v) setGoalId(""); }} />
+              </div>
+              {isGoalReservation && (
+                <Select value={goalId} onValueChange={setGoalId}>
+                  <SelectTrigger><SelectValue placeholder="Selecione a meta" /></SelectTrigger>
+                  <SelectContent>
+                    {goals.map((g) => <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+          )}
           <Button type="submit" className="w-full" disabled={createTx.isPending}>
             {createTx.isPending ? "Criando..." : "Criar Transação"}
           </Button>
