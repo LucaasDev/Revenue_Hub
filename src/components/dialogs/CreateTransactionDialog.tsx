@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { useCreateTransaction, useAccounts, useCategories } from "@/hooks/useSupabaseData";
+import { useCreateTransaction, useAccounts, useCategories, useGoals } from "@/hooks/useSupabaseData";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 
