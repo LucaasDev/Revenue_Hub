@@ -13,6 +13,7 @@ import Reports from "./pages/Reports";
 import Categories from "./pages/Categories";
 import Profile from "./pages/Profile";
 import SettingsAccounts from "./pages/SettingsAccounts";
+import FamilyMembers from "./pages/FamilyMembers";
 import Login from "./pages/Login";
 import AcceptInvite from "./pages/AcceptInvite";
 import NotFound from "./pages/NotFound";
@@ -40,6 +41,7 @@ function AppRoutes() {
         <Route path="/categories" element={<Categories />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/settings/accounts" element={<SettingsAccounts />} />
+        <Route path="/family" element={<FamilyMembers />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>

@@ -8,6 +8,7 @@ import {
   BarChart3,
   Tags,
   User,
+  Users,
   LogOut,
   Wallet,
   Menu,
@@ -35,6 +36,7 @@ const configSubItems = [
   { to: "/accounts", label: "Contas", icon: Landmark },
   { to: "/goals", label: "Metas", icon: Target },
   { to: "/categories", label: "Categorias", icon: Tags },
+  { to: "/family", label: "Membros da Família", icon: Users },
 ];
 
 export function AppTopNav() {

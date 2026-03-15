@@ -121,6 +121,106 @@ export type Database = {
         }
         Relationships: []
       }
+      family_groups: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          owner_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name?: string
+          owner_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          owner_id?: string
+        }
+        Relationships: []
+      }
+      family_invites: {
+        Row: {
+          created_at: string
+          email: string
+          expires_at: string
+          family_id: string
+          id: string
+          invited_by: string
+          name: string
+          role: Database["public"]["Enums"]["family_role"]
+          status: string
+          token: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          expires_at?: string
+          family_id: string
+          id?: string
+          invited_by: string
+          name?: string
+          role?: Database["public"]["Enums"]["family_role"]
+          status?: string
+          token?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          expires_at?: string
+          family_id?: string
+          id?: string
+          invited_by?: string
+          name?: string
+          role?: Database["public"]["Enums"]["family_role"]
+          status?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_invites_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "family_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      family_members: {
+        Row: {
+          family_id: string
+          id: string
+          joined_at: string
+          role: Database["public"]["Enums"]["family_role"]
+          user_id: string
+        }
+        Insert: {
+          family_id: string
+          id?: string
+          joined_at?: string
+          role?: Database["public"]["Enums"]["family_role"]
+          user_id: string
+        }
+        Update: {
+          family_id?: string
+          id?: string
+          joined_at?: string
+          role?: Database["public"]["Enums"]["family_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_members_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "family_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       goals: {
         Row: {
           created_at: string
@@ -294,6 +394,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      ensure_user_family: { Args: { _user_id: string }; Returns: string }
+      get_family_role: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["family_role"]
+      }
+      get_user_family_id: { Args: { _user_id: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -301,11 +407,17 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_family_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_family_member: {
+        Args: { _target_user_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       account_type: "corrente" | "carteira" | "investimento"
       app_role: "admin" | "user"
       category_type: "receita" | "despesa"
+      family_role: "admin" | "editor" | "viewer"
       invite_status: "pending" | "accepted"
       recurrence_type: "mensal" | "anual"
       transaction_status: "pendente" | "pago" | "recebido"
@@ -440,6 +552,7 @@ export const Constants = {
       account_type: ["corrente", "carteira", "investimento"],
       app_role: ["admin", "user"],
       category_type: ["receita", "despesa"],
+      family_role: ["admin", "editor", "viewer"],
       invite_status: ["pending", "accepted"],
       recurrence_type: ["mensal", "anual"],
       transaction_status: ["pendente", "pago", "recebido"],
