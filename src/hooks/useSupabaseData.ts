@@ -168,6 +168,7 @@ export function useCreateTransaction() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["transactions"] });
       qc.invalidateQueries({ queryKey: ["accounts"] });
+      qc.invalidateQueries({ queryKey: ["goals"] });
     },
   });
 }
@@ -182,6 +183,7 @@ export function useUpdateTransaction() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["transactions"] });
       qc.invalidateQueries({ queryKey: ["accounts"] });
+      qc.invalidateQueries({ queryKey: ["goals"] });
     },
   });
 }
@@ -196,6 +198,7 @@ export function useDeleteTransaction() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["transactions"] });
       qc.invalidateQueries({ queryKey: ["accounts"] });
+      qc.invalidateQueries({ queryKey: ["goals"] });
     },
   });
 }

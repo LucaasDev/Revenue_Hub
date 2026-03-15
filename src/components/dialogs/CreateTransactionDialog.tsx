@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { useCreateTransaction, useAccounts, useCategories } from "@/hooks/useSupabaseData";
+import { useCreateTransaction, useAccounts, useCategories, useGoals } from "@/hooks/useSupabaseData";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 
@@ -19,9 +19,12 @@ export function CreateTransactionDialog() {
   const [categoryId, setCategoryId] = useState("");
   const [isRecurring, setIsRecurring] = useState(false);
   const [classification, setClassification] = useState<"receita" | "fixa" | "variavel">("variavel");
+  const [isGoalReservation, setIsGoalReservation] = useState(false);
+  const [goalId, setGoalId] = useState("");
   const createTx = useCreateTransaction();
   const { data: accounts = [] } = useAccounts();
   const { data: categories = [] } = useCategories();
+  const { data: goals = [] } = useGoals();
 
   const filteredCategories = categories.filter((c) => c.type === type);
 
@@ -56,12 +59,14 @@ export function CreateTransactionDialog() {
         account_id: accountId,
         category_id: categoryId || null,
         is_recurring: isRecurring,
-      },
+        goal_id: isGoalReservation && goalId ? goalId : null,
+      } as any,
       {
         onSuccess: () => {
           toast.success("Transação criada!");
           setName(""); setAmount(""); setDueDate(""); setAccountId(""); setCategoryId("");
           setClassification("variavel"); setType("despesa"); setIsRecurring(false);
+          setIsGoalReservation(false); setGoalId("");
           setOpen(false);
         },
         onError: () => toast.error("Erro ao criar transação"),
@@ -120,6 +125,22 @@ export function CreateTransactionDialog() {
               </SelectContent>
             </Select>
           </div>
+          {type === "despesa" && (
+            <div className="space-y-3 rounded-lg border border-border p-3">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="goal-reservation" className="text-sm">🎯 Reservar para meta</Label>
+                <Switch id="goal-reservation" checked={isGoalReservation} onCheckedChange={(v) => { setIsGoalReservation(v); if (!v) setGoalId(""); }} />
+              </div>
+              {isGoalReservation && (
+                <Select value={goalId} onValueChange={setGoalId}>
+                  <SelectTrigger><SelectValue placeholder="Selecione a meta" /></SelectTrigger>
+                  <SelectContent>
+                    {goals.map((g) => <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+          )}
           <Button type="submit" className="w-full" disabled={createTx.isPending}>
             {createTx.isPending ? "Criando..." : "Criar Transação"}
           </Button>

@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useUpdateTransaction, useDeleteTransaction, useAccounts, useCategories } from "@/hooks/useSupabaseData";
+import { useUpdateTransaction, useDeleteTransaction, useAccounts, useCategories, useGoals } from "@/hooks/useSupabaseData";
 import { toast } from "sonner";
+import { Switch } from "@/components/ui/switch";
 import { Trash2 } from "lucide-react";
 
 interface Props {
@@ -23,10 +24,13 @@ export function EditTransactionDialog({ transaction, open, onOpenChange }: Props
   const [categoryId, setCategoryId] = useState("");
   const [status, setStatus] = useState<"pendente" | "pago" | "recebido">("pendente");
   const [classification, setClassification] = useState<"receita" | "fixa" | "variavel">("variavel");
+  const [isGoalReservation, setIsGoalReservation] = useState(false);
+  const [goalId, setGoalId] = useState("");
   const updateTx = useUpdateTransaction();
   const deleteTx = useDeleteTransaction();
   const { data: accounts = [] } = useAccounts();
   const { data: categories = [] } = useCategories();
+  const { data: goals = [] } = useGoals();
 
   useEffect(() => {
     if (transaction) {
@@ -37,6 +41,8 @@ export function EditTransactionDialog({ transaction, open, onOpenChange }: Props
       setAccountId(transaction.account_id);
       setCategoryId(transaction.category_id || "");
       setStatus(transaction.status);
+      setIsGoalReservation(!!transaction.goal_id);
+      setGoalId(transaction.goal_id || "");
       if (transaction.type === "receita") {
         setClassification("receita");
       } else if (transaction.is_recurring) {
@@ -61,7 +67,7 @@ export function EditTransactionDialog({ transaction, open, onOpenChange }: Props
     e.preventDefault();
     if (!transaction) return;
     updateTx.mutate(
-      { id: transaction.id, name: name.trim(), type, amount: parseFloat(amount), due_date: dueDate, account_id: accountId, category_id: categoryId || null, status, is_recurring: isRecurring },
+      { id: transaction.id, name: name.trim(), type, amount: parseFloat(amount), due_date: dueDate, account_id: accountId, category_id: categoryId || null, status, is_recurring: isRecurring, goal_id: isGoalReservation && goalId ? goalId : null } as any,
       { onSuccess: () => { toast.success("Transação atualizada!"); onOpenChange(false); }, onError: () => toast.error("Erro ao atualizar") }
     );
   };
@@ -127,6 +133,22 @@ export function EditTransactionDialog({ transaction, open, onOpenChange }: Props
             <Label>Data de Vencimento</Label>
             <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
           </div>
+          {type === "despesa" && (
+            <div className="space-y-3 rounded-lg border border-border p-3">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="edit-goal-reservation" className="text-sm">🎯 Reservar para meta</Label>
+                <Switch id="edit-goal-reservation" checked={isGoalReservation} onCheckedChange={(v) => { setIsGoalReservation(v); if (!v) setGoalId(""); }} />
+              </div>
+              {isGoalReservation && (
+                <Select value={goalId} onValueChange={setGoalId}>
+                  <SelectTrigger><SelectValue placeholder="Selecione a meta" /></SelectTrigger>
+                  <SelectContent>
+                    {goals.map((g) => <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+          )}
           <div className="flex gap-2">
             <Button type="submit" className="flex-1" disabled={updateTx.isPending}>
               {updateTx.isPending ? "Salvando..." : "Salvar"}

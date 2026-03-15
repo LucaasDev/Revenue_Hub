@@ -192,6 +192,7 @@ export type Database = {
           category_id: string | null
           created_at: string
           due_date: string
+          goal_id: string | null
           id: string
           is_recurring: boolean
           name: string
@@ -208,6 +209,7 @@ export type Database = {
           category_id?: string | null
           created_at?: string
           due_date: string
+          goal_id?: string | null
           id?: string
           is_recurring?: boolean
           name: string
@@ -226,6 +228,7 @@ export type Database = {
           category_id?: string | null
           created_at?: string
           due_date?: string
+          goal_id?: string | null
           id?: string
           is_recurring?: boolean
           name?: string
@@ -257,6 +260,13 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "goals"
             referencedColumns: ["id"]
           },
         ]
