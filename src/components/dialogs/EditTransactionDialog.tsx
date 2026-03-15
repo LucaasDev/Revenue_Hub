@@ -132,6 +132,22 @@ export function EditTransactionDialog({ transaction, open, onOpenChange }: Props
             <Label>Data de Vencimento</Label>
             <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
           </div>
+          {type === "despesa" && (
+            <div className="space-y-3 rounded-lg border border-border p-3">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="edit-goal-reservation" className="text-sm">🎯 Reservar para meta</Label>
+                <Switch id="edit-goal-reservation" checked={isGoalReservation} onCheckedChange={(v) => { setIsGoalReservation(v); if (!v) setGoalId(""); }} />
+              </div>
+              {isGoalReservation && (
+                <Select value={goalId} onValueChange={setGoalId}>
+                  <SelectTrigger><SelectValue placeholder="Selecione a meta" /></SelectTrigger>
+                  <SelectContent>
+                    {goals.map((g) => <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+          )}
           <div className="flex gap-2">
             <Button type="submit" className="flex-1" disabled={updateTx.isPending}>
               {updateTx.isPending ? "Salvando..." : "Salvar"}
