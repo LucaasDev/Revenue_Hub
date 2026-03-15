@@ -59,12 +59,14 @@ export function CreateTransactionDialog() {
         account_id: accountId,
         category_id: categoryId || null,
         is_recurring: isRecurring,
-      },
+        goal_id: isGoalReservation && goalId ? goalId : null,
+      } as any,
       {
         onSuccess: () => {
           toast.success("Transação criada!");
           setName(""); setAmount(""); setDueDate(""); setAccountId(""); setCategoryId("");
           setClassification("variavel"); setType("despesa"); setIsRecurring(false);
+          setIsGoalReservation(false); setGoalId("");
           setOpen(false);
         },
         onError: () => toast.error("Erro ao criar transação"),
