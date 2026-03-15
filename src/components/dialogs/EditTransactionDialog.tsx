@@ -23,10 +23,13 @@ export function EditTransactionDialog({ transaction, open, onOpenChange }: Props
   const [categoryId, setCategoryId] = useState("");
   const [status, setStatus] = useState<"pendente" | "pago" | "recebido">("pendente");
   const [classification, setClassification] = useState<"receita" | "fixa" | "variavel">("variavel");
+  const [isGoalReservation, setIsGoalReservation] = useState(false);
+  const [goalId, setGoalId] = useState("");
   const updateTx = useUpdateTransaction();
   const deleteTx = useDeleteTransaction();
   const { data: accounts = [] } = useAccounts();
   const { data: categories = [] } = useCategories();
+  const { data: goals = [] } = useGoals();
 
   useEffect(() => {
     if (transaction) {
