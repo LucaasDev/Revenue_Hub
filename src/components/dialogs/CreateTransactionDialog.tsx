@@ -19,9 +19,12 @@ export function CreateTransactionDialog() {
   const [categoryId, setCategoryId] = useState("");
   const [isRecurring, setIsRecurring] = useState(false);
   const [classification, setClassification] = useState<"receita" | "fixa" | "variavel">("variavel");
+  const [isGoalReservation, setIsGoalReservation] = useState(false);
+  const [goalId, setGoalId] = useState("");
   const createTx = useCreateTransaction();
   const { data: accounts = [] } = useAccounts();
   const { data: categories = [] } = useCategories();
+  const { data: goals = [] } = useGoals();
 
   const filteredCategories = categories.filter((c) => c.type === type);
 
