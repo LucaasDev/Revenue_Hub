@@ -66,7 +66,7 @@ export function EditTransactionDialog({ transaction, open, onOpenChange }: Props
     e.preventDefault();
     if (!transaction) return;
     updateTx.mutate(
-      { id: transaction.id, name: name.trim(), type, amount: parseFloat(amount), due_date: dueDate, account_id: accountId, category_id: categoryId || null, status, is_recurring: isRecurring },
+      { id: transaction.id, name: name.trim(), type, amount: parseFloat(amount), due_date: dueDate, account_id: accountId, category_id: categoryId || null, status, is_recurring: isRecurring, goal_id: isGoalReservation && goalId ? goalId : null } as any,
       { onSuccess: () => { toast.success("Transação atualizada!"); onOpenChange(false); }, onError: () => toast.error("Erro ao atualizar") }
     );
   };
