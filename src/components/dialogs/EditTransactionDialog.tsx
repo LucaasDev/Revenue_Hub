@@ -40,6 +40,8 @@ export function EditTransactionDialog({ transaction, open, onOpenChange }: Props
       setAccountId(transaction.account_id);
       setCategoryId(transaction.category_id || "");
       setStatus(transaction.status);
+      setIsGoalReservation(!!transaction.goal_id);
+      setGoalId(transaction.goal_id || "");
       if (transaction.type === "receita") {
         setClassification("receita");
       } else if (transaction.is_recurring) {
