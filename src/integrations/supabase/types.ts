@@ -21,6 +21,7 @@ export type Database = {
           id: string
           initial_balance: number
           name: string
+          tenant_id: string | null
           type: Database["public"]["Enums"]["account_type"]
           updated_at: string
           user_id: string
@@ -31,6 +32,7 @@ export type Database = {
           id?: string
           initial_balance?: number
           name: string
+          tenant_id?: string | null
           type?: Database["public"]["Enums"]["account_type"]
           updated_at?: string
           user_id: string
@@ -41,11 +43,20 @@ export type Database = {
           id?: string
           initial_balance?: number
           name?: string
+          tenant_id?: string | null
           type?: Database["public"]["Enums"]["account_type"]
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "accounts_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "family_groups"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       cards: {
         Row: {
@@ -56,6 +67,7 @@ export type Database = {
           id: string
           limit: number
           name: string
+          tenant_id: string | null
           updated_at: string
           user_id: string
         }
@@ -67,6 +79,7 @@ export type Database = {
           id?: string
           limit?: number
           name: string
+          tenant_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -78,6 +91,7 @@ export type Database = {
           id?: string
           limit?: number
           name?: string
+          tenant_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -89,6 +103,13 @@ export type Database = {
             referencedRelation: "accounts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "cards_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "family_groups"
+            referencedColumns: ["id"]
+          },
         ]
       }
       categories: {
@@ -98,6 +119,7 @@ export type Database = {
           icon: string
           id: string
           name: string
+          tenant_id: string | null
           type: Database["public"]["Enums"]["category_type"]
           user_id: string
         }
@@ -107,6 +129,7 @@ export type Database = {
           icon?: string
           id?: string
           name: string
+          tenant_id?: string | null
           type: Database["public"]["Enums"]["category_type"]
           user_id: string
         }
@@ -116,10 +139,19 @@ export type Database = {
           icon?: string
           id?: string
           name?: string
+          tenant_id?: string | null
           type?: Database["public"]["Enums"]["category_type"]
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "categories_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "family_groups"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       family_groups: {
         Row: {
@@ -127,18 +159,24 @@ export type Database = {
           id: string
           name: string
           owner_id: string
+          plan: string
+          status: string
         }
         Insert: {
           created_at?: string
           id?: string
           name?: string
           owner_id: string
+          plan?: string
+          status?: string
         }
         Update: {
           created_at?: string
           id?: string
           name?: string
           owner_id?: string
+          plan?: string
+          status?: string
         }
         Relationships: []
       }
@@ -229,6 +267,7 @@ export type Database = {
           id: string
           name: string
           target_amount: number
+          tenant_id: string | null
           updated_at: string
           user_id: string
         }
@@ -239,6 +278,7 @@ export type Database = {
           id?: string
           name: string
           target_amount: number
+          tenant_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -249,10 +289,19 @@ export type Database = {
           id?: string
           name?: string
           target_amount?: number
+          tenant_id?: string | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "goals_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "family_groups"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       invites: {
         Row: {
@@ -298,6 +347,7 @@ export type Database = {
           name: string
           recurrence_type: Database["public"]["Enums"]["recurrence_type"] | null
           status: Database["public"]["Enums"]["transaction_status"]
+          tenant_id: string | null
           type: Database["public"]["Enums"]["transaction_type"]
           updated_at: string
           user_id: string
@@ -317,6 +367,7 @@ export type Database = {
             | Database["public"]["Enums"]["recurrence_type"]
             | null
           status?: Database["public"]["Enums"]["transaction_status"]
+          tenant_id?: string | null
           type: Database["public"]["Enums"]["transaction_type"]
           updated_at?: string
           user_id: string
@@ -336,6 +387,7 @@ export type Database = {
             | Database["public"]["Enums"]["recurrence_type"]
             | null
           status?: Database["public"]["Enums"]["transaction_status"]
+          tenant_id?: string | null
           type?: Database["public"]["Enums"]["transaction_type"]
           updated_at?: string
           user_id?: string
@@ -369,6 +421,13 @@ export type Database = {
             referencedRelation: "goals"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "transactions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "family_groups"
+            referencedColumns: ["id"]
+          },
         ]
       }
       user_roles: {
@@ -394,12 +453,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_get_growth: { Args: never; Returns: Json }
+      admin_get_stats: { Args: never; Returns: Json }
+      admin_get_tenants: { Args: never; Returns: Json }
+      admin_get_users: { Args: never; Returns: Json }
+      admin_toggle_user: {
+        Args: { _active: boolean; _target_user_id: string }
+        Returns: undefined
+      }
       ensure_user_family: { Args: { _user_id: string }; Returns: string }
       get_family_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["family_role"]
       }
       get_user_family_id: { Args: { _user_id: string }; Returns: string }
+      get_user_tenant_id: { Args: { _user_id: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -412,6 +480,7 @@ export type Database = {
         Args: { _target_user_id: string; _user_id: string }
         Returns: boolean
       }
+      is_global_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       account_type: "corrente" | "carteira" | "investimento"
