@@ -15,6 +15,7 @@ import {
   X,
   Settings,
   ChevronDown,
+  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -43,7 +44,7 @@ export function AppTopNav() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { signOut, user } = useAuth();
+  const { signOut, user, isGlobalAdmin } = useAuth();
 
   const isConfigActive = configSubItems.some((item) => location.pathname === item.to);
 
@@ -124,6 +125,11 @@ export function AppTopNav() {
               <DropdownMenuItem onClick={() => navigate("/profile")}>
                 <User className="h-4 w-4 mr-2" /> Meu Perfil
               </DropdownMenuItem>
+              {isGlobalAdmin && (
+                <DropdownMenuItem onClick={() => navigate("/admin")}>
+                  <Shield className="h-4 w-4 mr-2" /> Admin
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={async () => { await signOut(); navigate("/login"); }}>
                 <LogOut className="h-4 w-4 mr-2" /> Sair

@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { AppLayout } from "@/components/AppLayout";
+import { AdminLayout } from "@/components/admin/AdminLayout";
 import Index from "./pages/Index";
 import Transactions from "./pages/Transactions";
 import Accounts from "./pages/Accounts";
@@ -16,6 +17,9 @@ import SettingsAccounts from "./pages/SettingsAccounts";
 import FamilyMembers from "./pages/FamilyMembers";
 import Login from "./pages/Login";
 import AcceptInvite from "./pages/AcceptInvite";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminTenants from "./pages/admin/AdminTenants";
+import AdminUsers from "./pages/admin/AdminUsers";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +46,11 @@ function AppRoutes() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/settings/accounts" element={<SettingsAccounts />} />
         <Route path="/family" element={<FamilyMembers />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="tenants" element={<AdminTenants />} />
+          <Route path="users" element={<AdminUsers />} />
+        </Route>
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>

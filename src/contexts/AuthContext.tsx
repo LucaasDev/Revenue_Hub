@@ -7,6 +7,7 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   isAdmin: boolean;
+  isGlobalAdmin: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
@@ -18,19 +19,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isGlobalAdmin, setIsGlobalAdmin] = useState(false);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        // Check admin role - defer to avoid deadlock
         setTimeout(() => {
           supabase.rpc("has_role", { _user_id: session.user.id, _role: "admin" })
             .then(({ data }) => setIsAdmin(!!data));
+          supabase.rpc("is_global_admin", { _user_id: session.user.id })
+            .then(({ data }) => setIsGlobalAdmin(!!data));
         }, 0);
       } else {
         setIsAdmin(false);
+        setIsGlobalAdmin(false);
       }
       setLoading(false);
     });
@@ -41,6 +45,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (session?.user) {
         supabase.rpc("has_role", { _user_id: session.user.id, _role: "admin" })
           .then(({ data }) => setIsAdmin(!!data));
+        supabase.rpc("is_global_admin", { _user_id: session.user.id })
+          .then(({ data }) => setIsGlobalAdmin(!!data));
       }
       setLoading(false);
     });
@@ -58,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, isAdmin, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, isAdmin, isGlobalAdmin, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );
