@@ -127,6 +127,11 @@ export function AppTopNav() {
               <DropdownMenuItem onClick={() => navigate("/profile")}>
                 <User className="h-4 w-4 mr-2" /> Meu Perfil
               </DropdownMenuItem>
+              {isGlobalAdmin && (
+                <DropdownMenuItem onClick={() => navigate("/admin")}>
+                  <Shield className="h-4 w-4 mr-2" /> Admin
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={async () => { await signOut(); navigate("/login"); }}>
                 <LogOut className="h-4 w-4 mr-2" /> Sair
