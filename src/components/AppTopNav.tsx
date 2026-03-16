@@ -46,7 +46,7 @@ export function AppTopNav() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { signOut, user } = useAuth();
+  const { signOut, user, isGlobalAdmin } = useAuth();
 
   const isConfigActive = configSubItems.some((item) => location.pathname === item.to);
 
