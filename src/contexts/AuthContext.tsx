@@ -45,6 +45,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (session?.user) {
         supabase.rpc("has_role", { _user_id: session.user.id, _role: "admin" })
           .then(({ data }) => setIsAdmin(!!data));
+        supabase.rpc("is_global_admin", { _user_id: session.user.id })
+          .then(({ data }) => setIsGlobalAdmin(!!data));
       }
       setLoading(false);
     });
