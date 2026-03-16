@@ -26,13 +26,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        // Check admin role - defer to avoid deadlock
         setTimeout(() => {
           supabase.rpc("has_role", { _user_id: session.user.id, _role: "admin" })
             .then(({ data }) => setIsAdmin(!!data));
+          supabase.rpc("is_global_admin", { _user_id: session.user.id })
+            .then(({ data }) => setIsGlobalAdmin(!!data));
         }, 0);
       } else {
         setIsAdmin(false);
+        setIsGlobalAdmin(false);
       }
       setLoading(false);
     });
