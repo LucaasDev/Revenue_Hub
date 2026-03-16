@@ -45,3 +45,11 @@ VITE_SUPABASE_PROJECT_ID = "muuvbeackiwenubmjlid"
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[[ports]]
+localPort = 5001
+externalPort = 3001
+
+[[ports]]
+localPort = 23636
+externalPort = 3002
