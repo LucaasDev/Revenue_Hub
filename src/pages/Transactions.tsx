@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTransactions, useUpdateTransaction } from "@/hooks/useSupabaseData";
 import { motion } from "framer-motion";
-import { Search, CheckCircle, TrendingUp, Pin, Shuffle } from "lucide-react";
+import { Search, CheckCircle, TrendingUp, Pin, Shuffle, ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -12,6 +12,12 @@ import { toast } from "sonner";
 function formatCurrency(value: number) {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
+
+function formatMonthYear(date: Date) {
+  return date.toLocaleString("pt-BR", { month: "long", year: "numeric" });
+}
+
+const _now = new Date();
 
 function TransactionTable({ transactions, onEdit, updateTx }: { transactions: any[]; onEdit: (t: any) => void; updateTx: any }) {
   if (transactions.length === 0) {
@@ -82,8 +88,28 @@ const Transactions = () => {
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [editing, setEditing] = useState<any>(null);
+  const [selectedMonth, setSelectedMonth] = useState(_now.getMonth());
+  const [selectedYear, setSelectedYear] = useState(_now.getFullYear());
+
   const { data: transactions = [], isLoading } = useTransactions();
   const updateTx = useUpdateTransaction();
+
+  const goToPrevMonth = () => {
+    if (selectedMonth === 0) { setSelectedMonth(11); setSelectedYear((y) => y - 1); }
+    else setSelectedMonth((m) => m - 1);
+  };
+  const goToNextMonth = () => {
+    if (selectedMonth === 11) { setSelectedMonth(0); setSelectedYear((y) => y + 1); }
+    else setSelectedMonth((m) => m + 1);
+  };
+  const goToCurrentMonth = () => { setSelectedMonth(_now.getMonth()); setSelectedYear(_now.getFullYear()); };
+  const isCurrentMonth = selectedMonth === _now.getMonth() && selectedYear === _now.getFullYear();
+  const selectedDate = new Date(selectedYear, selectedMonth, 1);
+
+  const monthlyTransactions = transactions.filter((t) => {
+    const d = new Date(t.due_date);
+    return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
+  });
 
   const applyFilters = (list: any[]) =>
     list.filter((t) => {
@@ -92,31 +118,58 @@ const Transactions = () => {
       return true;
     });
 
-  const receitas = applyFilters(transactions.filter((t) => t.type === "receita"));
-  const despesasFixas = applyFilters(transactions.filter((t) => t.type === "despesa" && t.is_recurring));
-  const despesasVariaveis = applyFilters(transactions.filter((t) => t.type === "despesa" && !t.is_recurring));
+  const receitas = applyFilters(monthlyTransactions.filter((t) => t.type === "receita"));
+  const despesasFixas = applyFilters(monthlyTransactions.filter((t) => t.type === "despesa" && t.is_recurring));
+  const despesasVariaveis = applyFilters(monthlyTransactions.filter((t) => t.type === "despesa" && !t.is_recurring));
 
   const totalReceitas = receitas.reduce((s, t) => s + Number(t.amount), 0);
   const totalFixas = despesasFixas.reduce((s, t) => s + Number(t.amount), 0);
   const totalVariaveis = despesasVariaveis.reduce((s, t) => s + Number(t.amount), 0);
+  const totalFiltered = receitas.length + despesasFixas.length + despesasVariaveis.length;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">Fluxo de Caixa</h1>
-          <p className="text-sm text-muted-foreground">{transactions.length} transações</p>
+          <p className="text-sm text-muted-foreground">{totalFiltered} transações</p>
         </div>
         <CreateTransactionDialog />
       </div>
 
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="glass-card rounded-xl p-4 flex flex-wrap gap-3 items-center">
+      {/* Month navigator */}
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="glass-card rounded-xl p-3 flex items-center justify-between gap-3">
+        <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0 rounded-lg" onClick={goToPrevMonth} data-testid="button-prev-month">
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <div className="flex items-center gap-2.5 flex-1 justify-center">
+          <CalendarDays className="h-4 w-4 text-primary shrink-0" />
+          <span className="text-sm font-semibold text-foreground capitalize" data-testid="text-selected-month">
+            {formatMonthYear(selectedDate)}
+          </span>
+          {!isCurrentMonth && (
+            <button
+              onClick={goToCurrentMonth}
+              className="text-[11px] font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full hover:bg-primary/20 transition-colors"
+              data-testid="button-go-to-current-month"
+            >
+              Hoje
+            </button>
+          )}
+        </div>
+        <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0 rounded-lg" onClick={goToNextMonth} data-testid="button-next-month">
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </motion.div>
+
+      {/* Search and status filters */}
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="glass-card rounded-xl p-4 flex flex-wrap gap-3 items-center">
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Buscar transação..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+          <Input placeholder="Buscar transação..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" data-testid="input-search" />
         </div>
         <Select value={filterStatus} onValueChange={setFilterStatus}>
-          <SelectTrigger className="w-[150px]"><SelectValue placeholder="Status" /></SelectTrigger>
+          <SelectTrigger className="w-[150px]" data-testid="select-status"><SelectValue placeholder="Status" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Todos</SelectItem>
             <SelectItem value="pago">Pago</SelectItem>
