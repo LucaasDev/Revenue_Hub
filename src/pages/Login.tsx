@@ -36,7 +36,7 @@ const Login = () => {
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl gradient-primary">
               <Wallet className="h-6 w-6 text-primary-foreground" />
             </div>
-            <h1 className="text-xl font-bold text-foreground">Avenue</h1>
+            <h1 className="text-xl font-bold text-foreground">Revenue Hub</h1>
             <p className="text-sm text-muted-foreground">Entre com suas credenciais</p>
           </div>
 

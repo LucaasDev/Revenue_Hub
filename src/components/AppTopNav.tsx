@@ -57,7 +57,7 @@ export function AppTopNav() {
             <Wallet className="h-4 w-4 text-primary-foreground" />
           </div>
           <span className="text-lg font-bold text-foreground tracking-tight hidden sm:block">
-            Avenue
+            Revenue Hub
           </span>
         </NavLink>
 
