@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { useTransactions, useCategories, useAccounts } from "@/hooks/useSupabaseData";
 import { BarChart2, TrendingUp, PieChart as PieChartIcon } from "lucide-react";
+import ExportDialog from "@/components/ExportDialog";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Area, AreaChart, Legend,
