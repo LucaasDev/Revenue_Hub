@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Wallet, TrendingUp, TrendingDown, Clock, Calendar, CalendarDays, BarChart2, PieChart as PieChartIcon, Activity, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { StatCard } from "@/components/StatCard";
 import { useAccounts, useTransactions, useCategories } from "@/hooks/useSupabaseData";
+import { FinancialInsights } from "@/components/FinancialInsights";
 import { motion } from "framer-motion";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend,
