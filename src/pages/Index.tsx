@@ -123,6 +123,8 @@ const Dashboard = () => {
         <StatCard title="Pendentes" value={String(pendingCount)} subtitle="transações" icon={Clock} variant="pending" delay={0.3} />
       </div>
 
+      <FinancialInsights />
+
       {hasData ? (
         <>
           {/* Row 1: Bar chart + Recent transactions */}
