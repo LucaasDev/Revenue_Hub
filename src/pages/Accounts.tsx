@@ -1,20 +1,21 @@
 import { useState } from "react";
 import { useAccounts } from "@/hooks/useSupabaseData";
 import { motion } from "framer-motion";
-import { Landmark, Wallet, TrendingUp, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { Landmark, Wallet, TrendingUp, ArrowUpRight, ArrowDownRight, CreditCard, Plus } from "lucide-react";
 import { CreateAccountDialog } from "@/components/dialogs/CreateAccountDialog";
 import { EditAccountDialog } from "@/components/dialogs/EditAccountDialog";
 import { cn } from "@/lib/utils";
 import type { Tables } from "@/integrations/supabase/types";
+import { Button } from "@/components/ui/button";
 
 function formatCurrency(value: number) {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
-const ACCOUNT_CONFIG: Record<string, { icon: any; label: string; color: string; bg: string }> = {
-  corrente: { icon: Landmark, label: "Conta Corrente", color: "text-blue-400", bg: "bg-blue-500/10" },
-  carteira: { icon: Wallet, label: "Carteira", color: "text-amber-400", bg: "bg-amber-500/10" },
-  investimento: { icon: TrendingUp, label: "Investimento", color: "text-emerald-400", bg: "bg-emerald-500/10" },
+const ACCOUNT_CONFIG: Record<string, { icon: React.ElementType; label: string; gradient: string }> = {
+  corrente: { icon: Landmark, label: "Conta Corrente", gradient: "from-blue-500/20 to-blue-500/5" },
+  carteira: { icon: Wallet, label: "Carteira", gradient: "from-amber-500/20 to-amber-500/5" },
+  investimento: { icon: TrendingUp, label: "Investimento", gradient: "from-emerald-500/20 to-emerald-500/5" },
 };
 
 const Accounts = () => {
@@ -23,28 +24,78 @@ const Accounts = () => {
   const totalBalance = accounts.reduce((sum, a) => sum + Number(a.balance), 0);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4">
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Contas</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            {accounts.length} conta{accounts.length !== 1 ? "s" : ""} · Saldo total:{" "}
-            <span className={cn("font-semibold", totalBalance >= 0 ? "text-emerald-400" : "text-rose-400")}>
-              {formatCurrency(totalBalance)}
-            </span>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Contas</h1>
+          <p className="mt-1 text-muted-foreground">
+            Gerencie suas contas bancarias e carteiras
           </p>
         </div>
         <CreateAccountDialog />
       </div>
 
-      {isLoading ? (
-        <div className="glass-card rounded-xl p-10 text-center text-muted-foreground text-sm">Carregando...</div>
-      ) : accounts.length === 0 ? (
-        <div className="glass-card rounded-xl p-12 text-center">
-          <Landmark className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
-          <p className="text-sm font-medium text-foreground">Nenhuma conta cadastrada</p>
-          <p className="text-xs text-muted-foreground mt-1">Adicione uma conta para começar a registrar suas transações.</p>
+      {/* Summary Card */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="rounded-xl border bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20 p-6"
+      >
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/20">
+              <CreditCard className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Patrimonio Total</p>
+              <p className={cn(
+                "text-3xl font-bold tracking-tight",
+                totalBalance >= 0 ? "text-foreground" : "text-rose-500"
+              )}>
+                {formatCurrency(totalBalance)}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-6 text-sm">
+            <div>
+              <p className="text-muted-foreground">Contas</p>
+              <p className="text-xl font-semibold text-foreground">{accounts.length}</p>
+            </div>
+            <div className="h-8 w-px bg-border" />
+            <div>
+              <p className="text-muted-foreground">Positivas</p>
+              <p className="text-xl font-semibold text-emerald-500">
+                {accounts.filter(a => Number(a.balance) >= 0).length}
+              </p>
+            </div>
+          </div>
         </div>
+      </motion.div>
+
+      {/* Accounts Grid */}
+      {isLoading ? (
+        <div className="rounded-xl border bg-card p-12 text-center text-muted-foreground text-sm">
+          Carregando...
+        </div>
+      ) : accounts.length === 0 ? (
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-xl border bg-card p-12 text-center"
+        >
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+            <Landmark className="h-6 w-6 text-muted-foreground" />
+          </div>
+          <h3 className="text-lg font-semibold text-foreground">Nenhuma conta cadastrada</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Adicione uma conta para comecar a registrar suas transacoes.
+          </p>
+          <Button className="mt-6 gap-2">
+            <Plus className="h-4 w-4" />
+            Criar primeira conta
+          </Button>
+        </motion.div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {accounts.map((account, i) => {
@@ -56,42 +107,53 @@ const Accounts = () => {
             return (
               <motion.div
                 key={account.id}
-                initial={{ opacity: 0, y: 12 }}
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.08 }}
-                className="glass-card rounded-xl p-5 hover:border-primary/40 transition-all cursor-pointer group"
+                transition={{ delay: i * 0.08, duration: 0.4 }}
+                className={cn(
+                  "group cursor-pointer rounded-xl border bg-gradient-to-br p-5 transition-all duration-300 hover:shadow-lg hover:border-primary/30",
+                  cfg.gradient
+                )}
                 onClick={() => setEditing(account)}
               >
                 {/* Header */}
                 <div className="flex items-center gap-3 mb-4">
-                  <div className={cn("flex h-10 w-10 items-center justify-center rounded-xl shrink-0", cfg.bg)}>
-                    <Icon className={cn("h-5 w-5", cfg.color)} />
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-background/80 border border-border/50 shrink-0">
+                    <Icon className="h-5 w-5 text-foreground" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-foreground truncate">{account.name}</p>
+                    <p className="font-semibold text-foreground truncate">{account.name}</p>
                     <p className="text-xs text-muted-foreground">{cfg.label}</p>
                   </div>
                 </div>
 
                 {/* Balance */}
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <div>
-                    <p className="text-xs text-muted-foreground mb-0.5">Saldo atual</p>
-                    <p className={cn("text-2xl font-bold tabular-nums", Number(account.balance) >= 0 ? "text-foreground" : "text-rose-400")}>
+                    <p className="text-xs text-muted-foreground mb-1">Saldo atual</p>
+                    <p className={cn(
+                      "text-2xl font-bold tabular-nums",
+                      Number(account.balance) >= 0 ? "text-foreground" : "text-rose-500"
+                    )}>
                       {formatCurrency(Number(account.balance))}
                     </p>
                   </div>
 
-                  <div className="h-px bg-border/40" />
+                  <div className="h-px bg-border/50" />
 
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-[11px] text-muted-foreground">Saldo inicial</p>
-                      <p className="text-xs font-medium text-muted-foreground tabular-nums">{formatCurrency(Number(account.initial_balance))}</p>
+                      <p className="text-xs font-medium text-muted-foreground tabular-nums">
+                        {formatCurrency(Number(account.initial_balance))}
+                      </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-[11px] text-muted-foreground">Variação</p>
-                      <p className={cn("text-xs font-semibold flex items-center gap-0.5 justify-end tabular-nums", isPositive ? "text-emerald-400" : "text-rose-400")}>
+                      <p className="text-[11px] text-muted-foreground">Variacao</p>
+                      <p className={cn(
+                        "text-xs font-semibold flex items-center gap-0.5 justify-end tabular-nums",
+                        isPositive ? "text-emerald-500" : "text-rose-500"
+                      )}>
                         {isPositive ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
                         {formatCurrency(Math.abs(net))}
                       </p>
@@ -103,6 +165,7 @@ const Accounts = () => {
           })}
         </div>
       )}
+
       <EditAccountDialog account={editing} open={!!editing} onOpenChange={(o) => !o && setEditing(null)} />
     </div>
   );
