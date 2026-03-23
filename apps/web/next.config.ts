@@ -1,6 +1,4 @@
 import type { NextConfig } from 'next'
-// withSentryConfig é importado mas só ativado quando SENTRY_CONFIGURED=true estiver setado no Vercel
-import { withSentryConfig } from '@sentry/nextjs'
 
 const nextConfig: NextConfig = {
   // Habilita React strict mode para detectar problemas em dev
@@ -18,6 +16,12 @@ const nextConfig: NextConfig = {
 
   // Transpila pacotes do monorepo
   transpilePackages: ['@revenue-hub/database'],
+
+  // Pacotes com módulos nativos/binários que NÃO devem ser empacotados no bundle serverless.
+  // Isso evita falhas de packaging na Vercel causadas por:
+  // - @react-pdf/renderer: pdfkit/fontkit com binários nativos
+  // - @sentry/nextjs: require-in-the-middle (OpenTelemetry) com binários nativos
+  serverExternalPackages: ['@react-pdf/renderer', '@sentry/nextjs', '@opentelemetry/instrumentation'],
 
   // Headers de segurança
   async headers() {
@@ -53,15 +57,15 @@ const nextConfig: NextConfig = {
   },
 }
 
-// Ativa o plugin webpack do Sentry somente quando SENTRY_CONFIGURED=true estiver setado no Vercel
-// (após configurar org/project/authToken corretos no painel do Sentry)
-export default process.env.SENTRY_CONFIGURED === 'true'
-  ? withSentryConfig(nextConfig, {
-      org: process.env.SENTRY_ORG,
-      project: process.env.SENTRY_PROJECT,
-      authToken: process.env.SENTRY_AUTH_TOKEN,
-      silent: true,
-      disableLogger: true,
-      sourcemaps: { disable: false },
-    })
-  : nextConfig
+// Sentry: ativar quando SENTRY_CONFIGURED=true for setado na Vercel.
+// Para reativar, descomente o bloco abaixo e instale @sentry/nextjs se necessário.
+// import { withSentryConfig } from '@sentry/nextjs'
+// export default withSentryConfig(nextConfig, {
+//   org: process.env.SENTRY_ORG,
+//   project: process.env.SENTRY_PROJECT,
+//   authToken: process.env.SENTRY_AUTH_TOKEN,
+//   silent: true,
+//   disableLogger: true,
+// })
+
+export default nextConfig
