@@ -5,7 +5,23 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "outputs": [".next/**", "!.next/cache/**"],
+      "env": [
+        "NEXT_PUBLIC_SUPABASE_URL",
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+        "NEXT_PUBLIC_APP_URL",
+        "NEXT_PUBLIC_SENTRY_DSN",
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "SUPABASE_PROJECT_ID",
+        "STRIPE_SECRET_KEY",
+        "STRIPE_WEBHOOK_SECRET",
+        "STRIPE_PRO_MONTHLY_PRICE_ID",
+        "STRIPE_PRO_ANNUAL_PRICE_ID",
+        "SENTRY_DSN",
+        "SENTRY_ORG",
+        "SENTRY_PROJECT",
+        "SENTRY_AUTH_TOKEN"
+      ]
     },
     "dev": {
       "cache": false,
