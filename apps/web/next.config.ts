@@ -56,8 +56,8 @@ export default withSentryConfig(nextConfig, {
   // Esconde source maps do bundle final (servidos via Sentry)
   hideSourceMaps: true,
 
-  // Não bloqueia o build se o upload de source maps falhar
+  // Desabilita upload de source maps (habilitar após configurar Sentry org/project)
   sourcemaps: {
-    deleteSourcemapsAfterUpload: true,
+    disable: true,
   },
 })
