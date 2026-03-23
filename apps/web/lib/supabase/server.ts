@@ -31,3 +31,6 @@ export async function createServerClient() {
     },
   )
 }
+
+// Alias para compatibilidade com imports que usam createClient
+export const createClient = createServerClient
