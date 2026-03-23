@@ -7,6 +7,7 @@ node_modules/
 .next/
 out/
 dist/
+dist-ssr
 build/
 *.tsbuildinfo
 
@@ -16,6 +17,7 @@ build/
 .env.development.local
 .env.test.local
 .env.production.local
+*.local
 
 # ─── Vercel ──────────────────────────────────────────────────
 .vercel/
@@ -28,11 +30,15 @@ supabase/.temp/
 .turbo/
 .eslintcache
 .cache/
+
+# ─── Logs ────────────────────────────────────────────────────
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+lerna-debug.log*
 
 # ─── OS ──────────────────────────────────────────────────────
 .DS_Store
@@ -40,7 +46,13 @@ Thumbs.db
 desktop.ini
 
 # ─── IDE ─────────────────────────────────────────────────────
-.vscode/
-.idea/
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
 *.swp
 *.swo
+*.sw?
