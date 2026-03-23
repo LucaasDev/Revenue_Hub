@@ -1,0 +1,46 @@
+# ─── Dependências ────────────────────────────────────────────
+node_modules/
+.pnp
+.pnp.js
+
+# ─── Build / Output ──────────────────────────────────────────
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+
+# ─── Variáveis de ambiente (NUNCA subir) ─────────────────────
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ─── Vercel ──────────────────────────────────────────────────
+.vercel/
+
+# ─── Supabase local ──────────────────────────────────────────
+supabase/.branches/
+supabase/.temp/
+
+# ─── Cache / Ferramentas ─────────────────────────────────────
+.turbo/
+.eslintcache
+.cache/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ─── OS ──────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── IDE ─────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo

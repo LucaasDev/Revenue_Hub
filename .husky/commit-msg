@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Garante que o commit siga o formato Conventional Commits (opcional, mas recomendado)
+# npx --no -- commitlint --edit "$1"

@@ -1,0 +1,5 @@
+.next
+node_modules
+dist
+.turbo
+packages/database/types.ts
