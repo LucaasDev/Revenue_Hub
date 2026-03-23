@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next'
+// withSentryConfig é importado mas só ativado quando SENTRY_CONFIGURED=true estiver setado no Vercel
 import { withSentryConfig } from '@sentry/nextjs'
 
 const nextConfig: NextConfig = {
@@ -42,22 +43,15 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default withSentryConfig(nextConfig, {
-  // Organização e projeto do Sentry (configurar nas env vars do Vercel)
-  org: process.env.SENTRY_ORG,
-  project: process.env.SENTRY_PROJECT,
-
-  // Upload de source maps somente em produção
-  silent: !process.env.CI,
-
-  // Tree-shaking do SDK no browser
-  disableLogger: true,
-
-  // Esconde source maps do bundle final (servidos via Sentry)
-  hideSourceMaps: true,
-
-  // Desabilita upload de source maps (habilitar após configurar Sentry org/project)
-  sourcemaps: {
-    disable: true,
-  },
-})
+// Ativa o plugin webpack do Sentry somente quando SENTRY_CONFIGURED=true estiver setado no Vercel
+// (após configurar org/project/authToken corretos no painel do Sentry)
+export default process.env.SENTRY_CONFIGURED === 'true'
+  ? withSentryConfig(nextConfig, {
+      org: process.env.SENTRY_ORG,
+      project: process.env.SENTRY_PROJECT,
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      silent: true,
+      disableLogger: true,
+      sourcemaps: { disable: false },
+    })
+  : nextConfig
