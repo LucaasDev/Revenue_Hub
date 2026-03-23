@@ -1,38 +1,9 @@
-import { redirect } from 'next/navigation'
-import { createServerClient } from '@/lib/supabase/server'
-
 /**
- * Página raiz — redireciona para o workspace ativo do usuário.
- * O middleware já garante que só usuários autenticados chegam aqui.
+ * Root page — delegates to (marketing)/page.tsx which handles:
+ * - Auth check: redirects authenticated users to their workspace dashboard
+ * - Landing page: shows marketing content for unauthenticated visitors
+ *
+ * Having this re-export avoids the Next.js route-group conflict where
+ * both app/page.tsx and app/(marketing)/page.tsx would map to '/'.
  */
-export default async function RootPage() {
-  const supabase = await createServerClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/login')
-  }
-
-  // Busca o workspace pessoal (onde o usuário é owner)
-  const { data: membership } = await supabase
-    .from('workspace_members')
-    .select('workspace:workspaces(slug)')
-    .eq('user_id', user.id)
-    .eq('role', 'owner')
-    .is('workspace.deleted_at', null)
-    .order('workspace(created_at)', { ascending: true })
-    .limit(1)
-    .single()
-
-  const slug = (membership?.workspace as { slug: string } | null)?.slug
-
-  if (!slug) {
-    // Estado inesperado — workspace não encontrado
-    redirect('/login')
-  }
-
-  redirect(`/${slug}/dashboard`)
-}
+export { default } from './(marketing)/page'

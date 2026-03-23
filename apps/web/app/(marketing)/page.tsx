@@ -1,3 +1,5 @@
+import { redirect } from 'next/navigation';
+import { createServerClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import {
   CreditCard,
@@ -553,7 +555,25 @@ function Footer() {
 
 // ─── Page ───────────────────────────────────────────────────────────────────
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  // Redireciona usuários autenticados para o dashboard do workspace
+  const supabase = await createServerClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (user) {
+    const { data: membership } = await supabase
+      .from('workspace_members')
+      .select('workspace:workspaces(slug)')
+      .eq('user_id', user.id)
+      .eq('role', 'owner')
+      .is('workspace.deleted_at', null)
+      .order('workspace(created_at)', { ascending: true })
+      .limit(1)
+      .single()
+
+    const slug = (membership?.workspace as { slug: string } | null)?.slug
+    if (slug) redirect(`/${slug}/dashboard`)
+  }
   return (
     <div className="min-h-screen bg-white font-sans antialiased">
       <Navbar />
