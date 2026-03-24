@@ -153,7 +153,7 @@ function Navbar() {
             Entrar
           </Link>
           <Link
-            href="/register"
+            href="/signup"
             className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700"
           >
             Começar grátis
@@ -196,7 +196,7 @@ function HeroSection() {
 
         <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <Link
-            href="/register"
+            href="/signup"
             className="group flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 sm:w-auto"
           >
             Começar grátis por 20 dias
@@ -324,7 +324,7 @@ function HowItWorksSection() {
 
         <div className="mt-12 text-center">
           <Link
-            href="/register"
+            href="/signup"
             className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-8 py-4 font-semibold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700"
           >
             Criar conta grátis
@@ -378,7 +378,7 @@ function PricingSection() {
             </ul>
 
             <Link
-              href="/register"
+              href="/signup"
               className="block w-full rounded-xl border-2 border-indigo-600 py-3 text-center text-sm font-semibold text-indigo-600 hover:bg-indigo-50"
             >
               Começar grátis
@@ -422,7 +422,7 @@ function PricingSection() {
             </ul>
 
             <Link
-              href="/register"
+              href="/signup"
               className="block w-full rounded-xl bg-indigo-600 py-3 text-center text-sm font-semibold text-white hover:bg-indigo-700 shadow-lg shadow-indigo-200"
             >
               Começar grátis
@@ -505,7 +505,7 @@ function CtaSection() {
           Comece seu trial gratuito de 20 dias hoje. Sem cartão, sem compromisso.
         </p>
         <Link
-          href="/register"
+          href="/signup"
           className="inline-flex items-center gap-2 rounded-xl bg-white px-10 py-4 text-base font-bold text-indigo-600 shadow-xl hover:bg-indigo-50"
         >
           Criar conta grátis
@@ -563,16 +563,14 @@ export default async function LandingPage() {
   if (user) {
     const { data: membership } = await supabase
       .from('workspace_members')
-      .select('workspace:workspaces(slug)')
+      .select('workspaces(slug)')
       .eq('user_id', user.id)
       .eq('role', 'owner')
-      .is('workspace.deleted_at', null)
-      .order('workspace(created_at)', { ascending: true })
       .limit(1)
-      .single()
+      .maybeSingle()
 
-    const slug = (membership?.workspace as { slug: string } | null)?.slug
-    if (slug) redirect(`/${slug}/dashboard`)
+    const ws = membership?.workspaces as { slug: string } | null
+    if (ws?.slug) redirect(`/${ws.slug}/dashboard`)
   }
   return (
     <div className="min-h-screen bg-white font-sans antialiased">
