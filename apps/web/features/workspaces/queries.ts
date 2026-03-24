@@ -26,7 +26,7 @@ export async function getMyWorkspaces() {
   return { data, error: error?.message }
 }
 
-/** Busca um workspace pelo slug, incluindo o role do usuário */
+/** Busca um workspace pelo slug, retornando o objeto direto ou null */
 export async function getWorkspaceBySlug(slug: string) {
   const supabase = await createServerClient()
 
@@ -34,7 +34,7 @@ export async function getWorkspaceBySlug(slug: string) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) return { data: null, error: 'Não autenticado' }
+  if (!user) return null
 
   const { data: workspace, error } = await supabase
     .from('workspaces')
@@ -43,7 +43,7 @@ export async function getWorkspaceBySlug(slug: string) {
     .is('deleted_at', null)
     .single()
 
-  if (error || !workspace) return { data: null, error: 'Workspace não encontrado' }
+  if (error || !workspace) return null
 
   const { data: membership } = await supabase
     .from('workspace_members')
@@ -52,10 +52,7 @@ export async function getWorkspaceBySlug(slug: string) {
     .eq('user_id', user.id)
     .single()
 
-  return {
-    data: { ...workspace, userRole: membership?.role ?? null },
-    error: null,
-  }
+  return { ...workspace, userRole: membership?.role ?? null }
 }
 
 /** Lista membros de um workspace */
