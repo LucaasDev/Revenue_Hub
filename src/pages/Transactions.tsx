@@ -3,13 +3,12 @@ import { useTransactions, useUpdateTransaction, useAccounts, useGoals } from "@/
 import { motion } from "framer-motion";
 import {
   Search, CheckCircle, TrendingUp, Pin, Shuffle,
-  ChevronLeft, ChevronRight, CalendarDays, ChevronDown,
   Landmark, Wallet, TrendingDown, Target, ArrowUpRight, ArrowDownRight,
 } from "lucide-react";
+import { MonthNavigator, MONTHS_FULL } from "@/components/MonthNavigator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CreateTransactionDialog } from "@/components/dialogs/CreateTransactionDialog";
 import { EditTransactionDialog } from "@/components/dialogs/EditTransactionDialog";
 import { toast } from "sonner";
@@ -18,9 +17,6 @@ import { cn } from "@/lib/utils";
 function formatCurrency(value: number) {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
-
-const MONTHS = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-const MONTHS_FULL = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
 const ACCOUNT_ICONS: Record<string, any> = { corrente: Landmark, carteira: Wallet, investimento: TrendingUp };
 
@@ -227,20 +223,9 @@ const Transactions = () => {
   const [editing, setEditing] = useState<any>(null);
   const [selectedMonth, setSelectedMonth] = useState(_now.getMonth());
   const [selectedYear, setSelectedYear] = useState(_now.getFullYear());
-  const [pickerOpen, setPickerOpen] = useState(false);
 
   const { data: transactions = [], isLoading } = useTransactions();
   const updateTx = useUpdateTransaction();
-
-  const goToPrevMonth = () => {
-    if (selectedMonth === 0) { setSelectedMonth(11); setSelectedYear((y) => y - 1); }
-    else setSelectedMonth((m) => m - 1);
-  };
-  const goToNextMonth = () => {
-    if (selectedMonth === 11) { setSelectedMonth(0); setSelectedYear((y) => y + 1); }
-    else setSelectedMonth((m) => m + 1);
-  };
-  const isCurrentMonth = selectedMonth === _now.getMonth() && selectedYear === _now.getFullYear();
 
   const monthlyTransactions = transactions.filter((t) => {
     const d = new Date(t.due_date);
@@ -302,63 +287,12 @@ const Transactions = () => {
             <div className="h-5 w-px bg-border/50 hidden sm:block" />
 
             {/* Month selector */}
-            <div className="flex items-center gap-0.5">
-              <Button variant="ghost" size="icon" className="h-9 w-8 rounded-lg text-muted-foreground hover:text-foreground" onClick={goToPrevMonth}>
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-
-              <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
-                <PopoverTrigger asChild>
-                  <button className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-muted/60 transition-colors">
-                    <CalendarDays className="h-3.5 w-3.5 text-primary shrink-0" />
-                    <span className="text-sm font-semibold text-foreground capitalize whitespace-nowrap">
-                      {MONTHS_FULL[selectedMonth]} {selectedYear}
-                    </span>
-                    {!isCurrentMonth && (
-                      <span className="text-[10px] font-semibold text-primary bg-primary/10 px-1.5 py-0.5 rounded-full leading-none">Hoje</span>
-                    )}
-                    <ChevronDown className="h-3 w-3 text-muted-foreground" />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent align="center" className="w-68 p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <button className="h-7 w-7 flex items-center justify-center rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" onClick={() => setSelectedYear((y) => y - 1)}>
-                      <ChevronLeft className="h-4 w-4" />
-                    </button>
-                    <span className="text-sm font-semibold text-foreground">{selectedYear}</span>
-                    <button className="h-7 w-7 flex items-center justify-center rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" onClick={() => setSelectedYear((y) => y + 1)}>
-                      <ChevronRight className="h-4 w-4" />
-                    </button>
-                  </div>
-                  <div className="grid grid-cols-4 gap-1">
-                    {MONTHS.map((m, i) => (
-                      <button
-                        key={m}
-                        onClick={() => { setSelectedMonth(i); setPickerOpen(false); }}
-                        className={cn(
-                          "py-1.5 rounded-lg text-xs font-medium transition-colors",
-                          i === selectedMonth ? "bg-primary text-primary-foreground" :
-                          i === _now.getMonth() && selectedYear === _now.getFullYear() ? "bg-primary/10 text-primary hover:bg-primary/20" :
-                          "hover:bg-muted text-muted-foreground hover:text-foreground"
-                        )}
-                      >{m}</button>
-                    ))}
-                  </div>
-                  {!isCurrentMonth && (
-                    <button
-                      onClick={() => { setSelectedMonth(_now.getMonth()); setSelectedYear(_now.getFullYear()); setPickerOpen(false); }}
-                      className="w-full text-xs font-medium text-primary bg-primary/10 hover:bg-primary/20 transition-colors py-1.5 rounded-lg"
-                    >
-                      Ir para o mês atual
-                    </button>
-                  )}
-                </PopoverContent>
-              </Popover>
-
-              <Button variant="ghost" size="icon" className="h-9 w-8 rounded-lg text-muted-foreground hover:text-foreground" onClick={goToNextMonth}>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
+            <MonthNavigator
+              selectedMonth={selectedMonth}
+              selectedYear={selectedYear}
+              onMonthChange={setSelectedMonth}
+              onYearChange={setSelectedYear}
+            />
 
             <div className="h-5 w-px bg-border/50 hidden sm:block" />
 

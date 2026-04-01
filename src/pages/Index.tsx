@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { Wallet, TrendingUp, TrendingDown, Clock, Calendar, CalendarDays, BarChart2, PieChart as PieChartIcon, Activity, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { Wallet, TrendingUp, TrendingDown, Clock, BarChart2, PieChart as PieChartIcon, Activity, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { StatCard } from "@/components/StatCard";
 import { useAccounts, useTransactions, useCategories } from "@/hooks/useSupabaseData";
 import { FinancialInsights } from "@/components/FinancialInsights";
+import { MonthNavigator, MONTHS_FULL } from "@/components/MonthNavigator";
 import { motion } from "framer-motion";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend,
 } from "recharts";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
 function formatCurrency(value: number) {
@@ -20,20 +20,15 @@ const Dashboard = () => {
   const { data: accounts = [] } = useAccounts();
   const { data: transactions = [] } = useTransactions();
   const { data: categories = [] } = useCategories();
-  const [view, setView] = useState<"mensal" | "anual">("mensal");
+  const _now = new Date();
+  const [selectedMonth, setSelectedMonth] = useState(_now.getMonth());
+  const [selectedYear, setSelectedYear] = useState(_now.getFullYear());
 
   const totalBalance = accounts.reduce((sum, a) => sum + Number(a.balance), 0);
-  const now = new Date();
-  const currentMonth = now.getMonth();
-  const currentYear = now.getFullYear();
 
-  // Filter transactions based on view
   const periodTx = transactions.filter((t) => {
     const d = new Date(t.due_date);
-    if (view === "mensal") {
-      return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
-    }
-    return d.getFullYear() === currentYear;
+    return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
   });
 
   const incomeTotal = periodTx
@@ -44,34 +39,21 @@ const Dashboard = () => {
     .reduce((sum, t) => sum + Number(t.amount), 0);
   const pendingCount = periodTx.filter((t) => t.status === "pendente").length;
 
-  // Chart data based on view
-  const chartData = view === "mensal"
-    ? Array.from({ length: 6 }, (_, i) => {
-        const d = new Date(currentYear, currentMonth - 5 + i, 1);
-        const m = d.getMonth();
-        const y = d.getFullYear();
-        const monthTx = transactions.filter((t) => {
-          const td = new Date(t.due_date);
-          return td.getMonth() === m && td.getFullYear() === y;
-        });
-        return {
-          label: d.toLocaleString("pt-BR", { month: "short" }),
-          receitas: monthTx.filter((t) => t.type === "receita" && t.status === "recebido").reduce((s, t) => s + Number(t.amount), 0),
-          despesas: monthTx.filter((t) => t.type === "despesa" && t.status === "pago").reduce((s, t) => s + Number(t.amount), 0),
-        };
-      })
-    : Array.from({ length: 12 }, (_, i) => {
-        const d = new Date(currentYear, i, 1);
-        const monthTx = transactions.filter((t) => {
-          const td = new Date(t.due_date);
-          return td.getMonth() === i && td.getFullYear() === currentYear;
-        });
-        return {
-          label: d.toLocaleString("pt-BR", { month: "short" }),
-          receitas: monthTx.filter((t) => t.type === "receita" && t.status === "recebido").reduce((s, t) => s + Number(t.amount), 0),
-          despesas: monthTx.filter((t) => t.type === "despesa" && t.status === "pago").reduce((s, t) => s + Number(t.amount), 0),
-        };
-      });
+  // Chart data: 6 months centered around selected month
+  const chartData = Array.from({ length: 6 }, (_, i) => {
+    const d = new Date(selectedYear, selectedMonth - 5 + i, 1);
+    const m = d.getMonth();
+    const y = d.getFullYear();
+    const monthTx = transactions.filter((t) => {
+      const td = new Date(t.due_date);
+      return td.getMonth() === m && td.getFullYear() === y;
+    });
+    return {
+      label: d.toLocaleString("pt-BR", { month: "short" }),
+      receitas: monthTx.filter((t) => t.type === "receita" && t.status === "recebido").reduce((s, t) => s + Number(t.amount), 0),
+      despesas: monthTx.filter((t) => t.type === "despesa" && t.status === "pago").reduce((s, t) => s + Number(t.amount), 0),
+    };
+  });
 
   // Balance evolution
   const totalInitialBalance = accounts.reduce((s, a) => s + Number(a.initial_balance), 0);
@@ -99,7 +81,7 @@ const Dashboard = () => {
 
   const recentTransactions = transactions.slice(0, 5);
   const hasData = transactions.length > 0 || accounts.length > 0;
-  const periodLabel = view === "mensal" ? "Este mês" : "Este ano";
+  const periodLabel = `${MONTHS_FULL[selectedMonth]} ${selectedYear}`;
 
   return (
     <div className="space-y-6">
@@ -108,12 +90,12 @@ const Dashboard = () => {
           <h1 className="text-2xl font-bold tracking-tight text-foreground">Dashboard</h1>
           <p className="text-sm text-muted-foreground">Visão geral das suas finanças</p>
         </div>
-        <Tabs value={view} onValueChange={(v) => setView(v as any)}>
-          <TabsList>
-            <TabsTrigger value="mensal" className="gap-1.5"><Calendar className="h-3.5 w-3.5" /> Mensal</TabsTrigger>
-            <TabsTrigger value="anual" className="gap-1.5"><CalendarDays className="h-3.5 w-3.5" /> Anual</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <MonthNavigator
+          selectedMonth={selectedMonth}
+          selectedYear={selectedYear}
+          onMonthChange={setSelectedMonth}
+          onYearChange={setSelectedYear}
+        />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
