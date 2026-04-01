@@ -3,9 +3,9 @@ import { useTransactions, useUpdateTransaction, useAccounts, useGoals } from "@/
 import { motion } from "framer-motion";
 import {
   Search, CheckCircle, TrendingUp, Pin, Shuffle,
-  ChevronLeft, ChevronRight, CalendarDays, ChevronDown,
   Landmark, Wallet, TrendingDown, Target, ArrowUpRight, ArrowDownRight,
 } from "lucide-react";
+import { MonthNavigator, MONTHS_FULL } from "@/components/MonthNavigator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
