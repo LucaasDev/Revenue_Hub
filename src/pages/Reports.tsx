@@ -54,10 +54,12 @@ const Reports = () => {
   const { data: transactions = [] } = useTransactions();
   const { data: categories = [] } = useCategories();
   const { data: accounts = [] } = useAccounts();
+  const _now = new Date();
+  const [selectedMonth, setSelectedMonth] = useState(_now.getMonth());
+  const [selectedYear, setSelectedYear] = useState(_now.getFullYear());
 
-  const now = new Date();
   const monthlyData = Array.from({ length: 6 }, (_, i) => {
-    const d = new Date(now.getFullYear(), now.getMonth() - 5 + i, 1);
+    const d = new Date(selectedYear, selectedMonth - 5 + i, 1);
     const m = d.getMonth();
     const y = d.getFullYear();
     const monthTx = transactions.filter((t) => {
@@ -80,10 +82,15 @@ const Reports = () => {
     });
   })();
 
+  const periodTx = transactions.filter((t) => {
+    const d = new Date(t.due_date);
+    return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
+  });
+
   const expenseByCategory = categories
     .filter((c) => c.type === "despesa")
     .map((cat) => {
-      const total = transactions
+      const total = periodTx
         .filter((t) => t.category_id === cat.id && t.status === "pago")
         .reduce((s, t) => s + Number(t.amount), 0);
       return { name: `${cat.icon} ${cat.name}`, value: total };
@@ -104,7 +111,15 @@ const Reports = () => {
           <h1 className="text-2xl font-bold tracking-tight text-foreground">Relatórios</h1>
           <p className="text-sm text-muted-foreground mt-0.5">Análise dos últimos 6 meses</p>
         </div>
-        <ExportDialog />
+        <div className="flex items-center gap-3">
+          <MonthNavigator
+            selectedMonth={selectedMonth}
+            selectedYear={selectedYear}
+            onMonthChange={setSelectedMonth}
+            onYearChange={setSelectedYear}
+          />
+          <ExportDialog />
+        </div>
       </div>
 
       {/* Summary strip */}
