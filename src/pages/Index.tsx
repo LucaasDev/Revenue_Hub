@@ -20,20 +20,15 @@ const Dashboard = () => {
   const { data: accounts = [] } = useAccounts();
   const { data: transactions = [] } = useTransactions();
   const { data: categories = [] } = useCategories();
-  const [view, setView] = useState<"mensal" | "anual">("mensal");
+  const _now = new Date();
+  const [selectedMonth, setSelectedMonth] = useState(_now.getMonth());
+  const [selectedYear, setSelectedYear] = useState(_now.getFullYear());
 
   const totalBalance = accounts.reduce((sum, a) => sum + Number(a.balance), 0);
-  const now = new Date();
-  const currentMonth = now.getMonth();
-  const currentYear = now.getFullYear();
 
-  // Filter transactions based on view
   const periodTx = transactions.filter((t) => {
     const d = new Date(t.due_date);
-    if (view === "mensal") {
-      return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
-    }
-    return d.getFullYear() === currentYear;
+    return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
   });
 
   const incomeTotal = periodTx
