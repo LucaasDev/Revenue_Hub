@@ -39,34 +39,21 @@ const Dashboard = () => {
     .reduce((sum, t) => sum + Number(t.amount), 0);
   const pendingCount = periodTx.filter((t) => t.status === "pendente").length;
 
-  // Chart data based on view
-  const chartData = view === "mensal"
-    ? Array.from({ length: 6 }, (_, i) => {
-        const d = new Date(currentYear, currentMonth - 5 + i, 1);
-        const m = d.getMonth();
-        const y = d.getFullYear();
-        const monthTx = transactions.filter((t) => {
-          const td = new Date(t.due_date);
-          return td.getMonth() === m && td.getFullYear() === y;
-        });
-        return {
-          label: d.toLocaleString("pt-BR", { month: "short" }),
-          receitas: monthTx.filter((t) => t.type === "receita" && t.status === "recebido").reduce((s, t) => s + Number(t.amount), 0),
-          despesas: monthTx.filter((t) => t.type === "despesa" && t.status === "pago").reduce((s, t) => s + Number(t.amount), 0),
-        };
-      })
-    : Array.from({ length: 12 }, (_, i) => {
-        const d = new Date(currentYear, i, 1);
-        const monthTx = transactions.filter((t) => {
-          const td = new Date(t.due_date);
-          return td.getMonth() === i && td.getFullYear() === currentYear;
-        });
-        return {
-          label: d.toLocaleString("pt-BR", { month: "short" }),
-          receitas: monthTx.filter((t) => t.type === "receita" && t.status === "recebido").reduce((s, t) => s + Number(t.amount), 0),
-          despesas: monthTx.filter((t) => t.type === "despesa" && t.status === "pago").reduce((s, t) => s + Number(t.amount), 0),
-        };
-      });
+  // Chart data: 6 months centered around selected month
+  const chartData = Array.from({ length: 6 }, (_, i) => {
+    const d = new Date(selectedYear, selectedMonth - 5 + i, 1);
+    const m = d.getMonth();
+    const y = d.getFullYear();
+    const monthTx = transactions.filter((t) => {
+      const td = new Date(t.due_date);
+      return td.getMonth() === m && td.getFullYear() === y;
+    });
+    return {
+      label: d.toLocaleString("pt-BR", { month: "short" }),
+      receitas: monthTx.filter((t) => t.type === "receita" && t.status === "recebido").reduce((s, t) => s + Number(t.amount), 0),
+      despesas: monthTx.filter((t) => t.type === "despesa" && t.status === "pago").reduce((s, t) => s + Number(t.amount), 0),
+    };
+  });
 
   // Balance evolution
   const totalInitialBalance = accounts.reduce((s, a) => s + Number(a.initial_balance), 0);
