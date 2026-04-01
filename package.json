@@ -2,8 +2,10 @@
   "name": "revenue-hub",
   "private": true,
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
+    "dev": "vite",
+    "build": "vite build",
+    "build:dev": "vite build",
+    "preview": "vite preview",
     "lint": "turbo run lint",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
