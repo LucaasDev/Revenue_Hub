@@ -81,7 +81,7 @@ const Dashboard = () => {
 
   const recentTransactions = transactions.slice(0, 5);
   const hasData = transactions.length > 0 || accounts.length > 0;
-  const periodLabel = view === "mensal" ? "Este mês" : "Este ano";
+  const periodLabel = `${MONTHS_FULL[selectedMonth]} ${selectedYear}`;
 
   return (
     <div className="space-y-6">
@@ -90,12 +90,12 @@ const Dashboard = () => {
           <h1 className="text-2xl font-bold tracking-tight text-foreground">Dashboard</h1>
           <p className="text-sm text-muted-foreground">Visão geral das suas finanças</p>
         </div>
-        <Tabs value={view} onValueChange={(v) => setView(v as any)}>
-          <TabsList>
-            <TabsTrigger value="mensal" className="gap-1.5"><Calendar className="h-3.5 w-3.5" /> Mensal</TabsTrigger>
-            <TabsTrigger value="anual" className="gap-1.5"><CalendarDays className="h-3.5 w-3.5" /> Anual</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <MonthNavigator
+          selectedMonth={selectedMonth}
+          selectedYear={selectedYear}
+          onMonthChange={setSelectedMonth}
+          onYearChange={setSelectedYear}
+        />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
