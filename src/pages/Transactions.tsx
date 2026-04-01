@@ -227,20 +227,9 @@ const Transactions = () => {
   const [editing, setEditing] = useState<any>(null);
   const [selectedMonth, setSelectedMonth] = useState(_now.getMonth());
   const [selectedYear, setSelectedYear] = useState(_now.getFullYear());
-  const [pickerOpen, setPickerOpen] = useState(false);
 
   const { data: transactions = [], isLoading } = useTransactions();
   const updateTx = useUpdateTransaction();
-
-  const goToPrevMonth = () => {
-    if (selectedMonth === 0) { setSelectedMonth(11); setSelectedYear((y) => y - 1); }
-    else setSelectedMonth((m) => m - 1);
-  };
-  const goToNextMonth = () => {
-    if (selectedMonth === 11) { setSelectedMonth(0); setSelectedYear((y) => y + 1); }
-    else setSelectedMonth((m) => m + 1);
-  };
-  const isCurrentMonth = selectedMonth === _now.getMonth() && selectedYear === _now.getFullYear();
 
   const monthlyTransactions = transactions.filter((t) => {
     const d = new Date(t.due_date);
