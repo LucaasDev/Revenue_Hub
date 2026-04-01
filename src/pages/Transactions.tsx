@@ -8,19 +8,10 @@ import {
 import { MonthNavigator, MONTHS_FULL } from "@/components/MonthNavigator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CreateTransactionDialog } from "@/components/dialogs/CreateTransactionDialog";
 import { EditTransactionDialog } from "@/components/dialogs/EditTransactionDialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-
-function formatCurrency(value: number) {
-  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
-
-const MONTHS = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-const MONTHS_FULL = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
 const ACCOUNT_ICONS: Record<string, any> = { corrente: Landmark, carteira: Wallet, investimento: TrendingUp };
 
