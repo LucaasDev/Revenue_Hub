@@ -8,10 +8,15 @@ import {
 import { MonthNavigator, MONTHS_FULL } from "@/components/MonthNavigator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CreateTransactionDialog } from "@/components/dialogs/CreateTransactionDialog";
 import { EditTransactionDialog } from "@/components/dialogs/EditTransactionDialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+
+function formatCurrency(value: number) {
+  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
 
 const ACCOUNT_ICONS: Record<string, any> = { corrente: Landmark, carteira: Wallet, investimento: TrendingUp };
 
